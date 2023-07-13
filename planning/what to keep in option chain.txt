@@ -1,0 +1,55 @@
+Expiry Dates Array = resultData.opExpiryDates
+Current Expiry Date = resultData.opExpiryDates[0]
+Spot Price = resultData.opDatas[0].index_close
+
+
+---------------- DATABASE STRUCTURE ---------------------
+
+                    db -> [symbol]
+                        |
+                        |
+            collections -> [current epxiry date]
+                        |
+                        |
+*data will be only of 41 strikes 20 up/down from current strike
+        documents -> object{strikePrice, oiArray}, totalOIArray
+                         
+
+Both PE and CE will be array of objects containing the following data
+
+-----------------------------------------------------------------------------------------------------
+{puts_change_oi, calls_change_oi} this entry will be pushed in array every 5 mins.
+
+{total_puts_change_oi, total_calls_change_oi} this entry will be pushed in array every 5 mins.
+-----------------------------------------------------------------------------------------------------
+
+
+NOTE:- option chain data will be not stored in database it'll be fetched when requested
+
+---------------- Data to show in option chain ----------------
+
+calls_oi
+calls_change_oi
+calls_iv
+calls_ltp
+calls_net_change
+call_delta
+call_gamma
+call_vega
+call_theta
+call_rho
+calls_builtup
+        time
+        strike_price
+        index_close
+puts_oi
+puts_change_oi
+puts_iv
+puts_ltp
+puts_net_change
+put_delta
+put_gamma
+put_vega
+put_theta
+put_rho
+puts_builtup
