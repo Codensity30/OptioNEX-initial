@@ -5,14 +5,14 @@ Spot Price = resultData.opDatas[0].index_close
 
 ---------------- DATABASE STRUCTURE ---------------------
 
-                    db -> [symbol]
+                    db -> [optionex]
                         |
                         |
-            collections -> [current epxiry date]
+            collections -> [symbol]
                         |
                         |
-*data will be only of 41 strikes 20 up/down from current strike
-        documents -> object{strikePrice, oiArray}, totalOIArray
+        documents -> object{strikePrice, oiArray}
+    (*data will be only of 41 strikes 20 up/down from current strike)
                          
 
 Both PE and CE will be array of objects containing the following data
@@ -20,7 +20,7 @@ Both PE and CE will be array of objects containing the following data
 -----------------------------------------------------------------------------------------------------
 {puts_change_oi, calls_change_oi} this entry will be pushed in array every 5 mins.
 
-{total_puts_change_oi, total_calls_change_oi} this entry will be pushed in array every 5 mins.
+special document where strike_price = 0, it contains = {total_puts_change_oi, total_calls_change_oi}
 -----------------------------------------------------------------------------------------------------
 
 
