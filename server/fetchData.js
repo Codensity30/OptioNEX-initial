@@ -2,6 +2,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const axios = require("axios");
+const schedule = require("node-schedule");
 
 //* function to handle error
 function errorHandler(error) {
@@ -23,107 +24,224 @@ const app = express();
 
 //! MONGOOSE SCHEMA ----------------------------------
 
-//* type of object within the oiArray
-const oiSchema = {
-  puts_change_oi: Number,
-  calls_change_oi: Number,
-};
-//* schema of documents
-const spDataSchema = new mongoose.Schema({
-  strikePrice: Number,
-  oiArray: [oiSchema],
+//* schema of docs for symbol list
+const symbolListSchema = new mongoose.Schema({
+  symbolName: String,
+  lotSize: Number,
 });
 
-//! ROUTING -------------------------------------------------------
+//* type of object within the oiArray
+const oi = {
+  putsCoi: Number,
+  callsCoi: Number,
+};
+//* schema of documents for coi change with time
+const oiDataSchema = new mongoose.Schema({
+  strikePrice: Number,
+  oiArray: [oi],
+});
 
-//* endpoint to fetch option chain of any symbol, expiry date
-app.get("/oc/:symbol/:expiryDate", async (req, res) => {
-  const { symbol, expiryDate } = req.params;
+//! SCHEDULING THE JOBS------------------------------------------
+
+//* important functions to store the and clear db in daily routine
+
+async function getAndStore(symbol) {
   const url = "https://webapi.niftytrader.in/webapi/option/fatch-option-chain";
 
   const response = await axios
     .get(url, {
-      params: { symbol: symbol, expirydate: expiryDate },
+      params: { symbol: symbol },
     })
     .catch(errorHandler);
 
   //* creating mongoose model with collection name same as symbol
-  const Symbol = mongoose.model(symbol, spDataSchema, symbol);
+  const Symbol = mongoose.model(symbol, oiDataSchema, symbol);
 
   //* parsing response from api to get the option data
   const opDatas = response.data.resultData.opDatas;
 
   //* important vaiables required
   const spot = opDatas[0].index_close;
-  const currentStrike = Math.ceil(spot / 50) * 50;
+
+  opDatas.sort((a, b) => {
+    return a.strike_price < b.strike_price;
+  });
+
+  const atmIndex = opDatas.findIndex((obj) => obj.strike_price > spot);
   let total_puts_change_oi = 0;
   let total_calls_change_oi = 0;
 
   //* entry of all sp lying in range of 1000 points up and down
-  opDatas.forEach(async (element) => {
+  const start = Math.max(0, atmIndex - 20);
+  const end = Math.min(opDatas.length - 1, atmIndex + 20);
+  for (let i = start; i <= end; i++) {
+    const element = opDatas[i];
     const sp = element.strike_price;
-    //suming up only 10 strikes up and down for total ois
-    if (Math.abs(sp - currentStrike) <= 500) {
+
+    //* suming up coi of 10 strikes up-down
+    if (Math.abs(i - atmIndex) <= 10) {
       total_puts_change_oi += element.puts_change_oi;
       total_calls_change_oi += element.calls_change_oi;
     }
-    if (Math.abs(sp - currentStrike) <= 1000) {
-      const doc = await Symbol.findOne({ strikePrice: sp });
-      // if doc is not present then create
-      if (!doc) {
-        await Symbol.create({
-          strikePrice: sp,
-          oiArray: {
-            puts_change_oi: element.puts_change_oi,
-            calls_change_oi: element.calls_change_oi,
-          },
-        });
-      }
-      // if present then update
-      else {
-        await Symbol.updateOne(
-          { strikePrice: sp },
-          {
-            $push: {
-              oiArray: {
-                puts_change_oi: element.puts_change_oi,
-                calls_change_oi: element.calls_change_oi,
-              },
-            },
-          }
-        );
-      }
+    //* storing coi of 20 strikes up-down in db
+    const doc = await Symbol.findOne({ strikePrice: sp }).catch(errorHandler);
+    const oiArray = {
+      putsCoi: element.puts_change_oi,
+      callsCoi: element.calls_change_oi,
+    };
+
+    if (!doc) {
+      await Symbol.create({ strikePrice: sp, oiArray }).catch(errorHandler);
+    } else {
+      await Symbol.updateOne({ strikePrice: sp }, { $push: { oiArray } }).catch(
+        errorHandler
+      );
+    }
+  }
+
+  //* special entry to keep track of the total put and call oi
+  const doc = await Symbol.findOne({ strikePrice: 0 }).catch(errorHandler);
+  const oiArray = {
+    putsCoi: total_puts_change_oi,
+    callsCoi: total_calls_change_oi,
+  };
+  if (!doc) {
+    await Symbol.create({ strikePrice: 0, oiArray }).catch(errorHandler);
+  } else {
+    await Symbol.updateOne({ strikePrice: 0 }, { $push: { oiArray } }).catch(
+      errorHandler
+    );
+  }
+}
+
+async function updateOi() {
+  await axios.get("http://localhost:8000/update-oiData").catch(errorHandler);
+}
+
+async function clearDb() {
+  await mongoose.connection.db.dropDatabase().catch(errorHandler);
+}
+
+//* sheduling jobs to run at certain interval and time
+
+process.env.TZ = "Asia/Kolkata";
+const dailyDbClearCron = "28 16 * * 1-5";
+const daily5minCron = "* 9-17 * * 1-5";
+
+const daily5Min = schedule.scheduleJob(daily5minCron, () => {
+  console.log("job is running");
+  updateOi();
+});
+
+const dailyDbClear = schedule.scheduleJob(dailyDbClearCron, () => {
+  console.log("db is cleared");
+  clearDb();
+});
+
+//! ROUTING -------------------------------------------------------
+
+//* endpoint for internal purposes
+app.get("/update-oiData", async (req, res) => {
+  const symList = ["NIFTY", "BANKNIFTY", "FINNIFTY"];
+
+  const requests = symList.map((element) => {
+    return getAndStore(element);
+  });
+
+  await Promise.all(requests).catch(errorHandler);
+
+  res.send("Initialize the database");
+  /*const requests = [];
+  for (const symbol of symList) {
+    requests.push(getAndStore(symbol));
+  }*/
+
+  /*const limit = pLimit(3);
+
+  const requests = symList.map((element) => {
+    return limit(() => getAndStore(element).catch(errorHandler));
+  });
+
+  await Promise.all(requests).catch(errorHandler);*/
+});
+
+//* endpoint to record symbols lists in database
+app.get("/symbol-list", async (req, res) => {
+  const url = "https://webapi.niftytrader.in/webapi/symbol/psymbol-list";
+
+  const response = await axios.get(url).catch(errorHandler);
+  const data = response.data.resultData;
+
+  const Symbol = mongoose.model("symbol_list", symbolListSchema);
+
+  data.forEach(async (element) => {
+    const doc = await Symbol.findOne({ symbolName: element.symbol_name }).catch(
+      errorHandler
+    );
+    if (!doc) {
+      await Symbol.create({
+        symbolName: element.symbol_name,
+        lotSize: element.lot_size,
+      });
+    } else {
+      await Symbol.updateOne(
+        { symbolName: element.symbol_name },
+        {
+          lotSize: element.lot_size,
+        }
+      );
     }
   });
 
-  //* special entry to keep track of the total put and call oi
-  const doc = await Symbol.findOne({ strikePrice: 0 });
-  // if doc is not present then create
-  if (!doc) {
-    await Symbol.create({
-      strikePrice: 0,
-      oiArray: {
-        puts_change_oi: total_puts_change_oi,
-        calls_change_oi: total_calls_change_oi,
-      },
-    });
-  }
-  // if present then update
-  else {
-    await Symbol.updateOne(
-      { strikePrice: 0 },
-      {
-        $push: {
-          oiArray: {
-            puts_change_oi: total_puts_change_oi,
-            calls_change_oi: total_calls_change_oi,
-          },
-        },
-      }
+  const symObj = await Symbol.find({}).catch(errorHandler);
+  const symList = [];
+  symObj.forEach((element) => {
+    symList.push(element.symbolName);
+  });
+
+  res.send(symList);
+});
+
+//* endpoint to fetch the live oi data of the specified expiry
+app.get("/live-oicoi-ex/:symbol/:exiryDate", async (req, res) => {
+  const { symbol, expiryDate } = req.params;
+
+  const url = "https://webapi.niftytrader.in/webapi/option/fatch-option-chain";
+
+  const response = await axios
+    .get(url, {
+      params: { symbol: symbol, expiryDate: expiryDate },
+    })
+    .catch(errorHandler);
+
+  const opDatas = response.data.resultData.opDatas;
+  const oiData = [];
+  const spot = opDatas[0].index_close;
+
+  let strikeDiff = 1e9;
+
+  for (let i = 11; i < opDatas.length; i++) {
+    strikeDiff = Math.min(
+      strikeDiff,
+      Math.abs(opDatas[10].strike_price - opDatas[i].strike_price)
     );
   }
 
-  res.send(opDatas);
+  const atm = Math.ceil(spot / strikeDiff) * strikeDiff;
+
+  opDatas.forEach((element) => {
+    const sp = element.strike_price;
+    if (Math.abs(sp - atm) <= strikeDiff * 10) {
+      oiData.push({
+        strikePrice: sp,
+        callsOi: element.calls_oi,
+        callsCoi: element.calls_change_oi,
+        putsOi: element.puts_oi,
+        putsCoi: element.puts_change_oi,
+      });
+    }
+  });
+  res.send(oiData);
 });
 
 //* listening on port
