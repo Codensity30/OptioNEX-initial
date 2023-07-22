@@ -53,3 +53,7 @@ put_vega
 put_theta
 put_rho
 puts_builtup
+
+-------------------------- COLOR PALETTE -------------------------------
+
+-> Bar chart => puts - #FF8787  calls - #03C988

@@ -3,6 +3,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const axios = require("axios");
 const schedule = require("node-schedule");
+const cors = require("cors");
 
 //* function to handle error
 function errorHandler(error) {
@@ -21,6 +22,7 @@ mongoose
 //* intializing express server
 const port = 8000;
 const app = express();
+app.use(cors());
 
 //! MONGOOSE SCHEMA ----------------------------------
 
@@ -32,6 +34,7 @@ const symbolListSchema = new mongoose.Schema({
 
 //* type of object within the oiArray
 const oi = {
+  time: String,
   putsCoi: Number,
   callsCoi: Number,
 };
@@ -44,6 +47,25 @@ const oiDataSchema = new mongoose.Schema({
 //! SCHEDULING THE JOBS------------------------------------------
 
 //* important functions to store the and clear db in daily routine
+
+function getCurrentISTTime() {
+  const currentTime = new Date();
+
+  const currentOffset = currentTime.getTimezoneOffset();
+
+  const ISTOffset = 330; // IST offset UTC +5:30
+
+  const ISTTime = new Date(
+    currentTime.getTime() + (ISTOffset + currentOffset) * 60000
+  );
+
+  // ISTTime now represents the time in IST coordinates
+
+  const hoursIST = ISTTime.getHours();
+  const minutesIST = ISTTime.getMinutes();
+
+  return `${hoursIST}:${minutesIST}`;
+}
 
 async function getAndStore(symbol) {
   const url = "https://webapi.niftytrader.in/webapi/option/fatch-option-chain";
@@ -86,6 +108,7 @@ async function getAndStore(symbol) {
     //* storing coi of 20 strikes up-down in db
     const doc = await Symbol.findOne({ strikePrice: sp }).catch(errorHandler);
     const oiArray = {
+      time: getCurrentISTTime(),
       putsCoi: element.puts_change_oi,
       callsCoi: element.calls_change_oi,
     };
@@ -102,6 +125,7 @@ async function getAndStore(symbol) {
   //* special entry to keep track of the total put and call oi
   const doc = await Symbol.findOne({ strikePrice: 0 }).catch(errorHandler);
   const oiArray = {
+    time: getCurrentISTTime(),
     putsCoi: total_puts_change_oi,
     callsCoi: total_calls_change_oi,
   };
@@ -125,13 +149,16 @@ async function clearDb() {
 //* sheduling jobs to run at certain interval and time
 
 process.env.TZ = "Asia/Kolkata";
-const dailyDbClearCron = "28 16 * * 1-5";
-const daily5minCron = "* 9-17 * * 1-5";
+const dailyDbClearCron = "14 9 * * 1-5";
+const daily5minCron = "*/5 9-15 * * 1-5";
+const canceldaily5minCron = "31 3 * * 1-5";
 
 const daily5Min = schedule.scheduleJob(daily5minCron, () => {
   console.log("job is running");
   updateOi();
 });
+
+const canceldaily5min = schedule.cancelJob(daily5Min);
 
 const dailyDbClear = schedule.scheduleJob(dailyDbClearCron, () => {
   console.log("db is cleared");
@@ -151,18 +178,6 @@ app.get("/update-oiData", async (req, res) => {
   await Promise.all(requests).catch(errorHandler);
 
   res.send("Initialize the database");
-  /*const requests = [];
-  for (const symbol of symList) {
-    requests.push(getAndStore(symbol));
-  }*/
-
-  /*const limit = pLimit(3);
-
-  const requests = symList.map((element) => {
-    return limit(() => getAndStore(element).catch(errorHandler));
-  });
-
-  await Promise.all(requests).catch(errorHandler);*/
 });
 
 //* endpoint to record symbols lists in database
@@ -228,20 +243,48 @@ app.get("/live-oicoi-ex/:symbol/:exiryDate", async (req, res) => {
   }
 
   const atm = Math.ceil(spot / strikeDiff) * strikeDiff;
+  oiData.push({ atm: atm });
 
   opDatas.forEach((element) => {
     const sp = element.strike_price;
     if (Math.abs(sp - atm) <= strikeDiff * 10) {
       oiData.push({
         strikePrice: sp,
-        callsOi: element.calls_oi,
-        callsCoi: element.calls_change_oi,
-        putsOi: element.puts_oi,
-        putsCoi: element.puts_change_oi,
+        callsOi: parseFloat((element.calls_oi / 100000).toFixed(2)),
+        callsCoi: parseFloat((element.calls_change_oi / 100000).toFixed(2)),
+        putsOi: parseFloat((element.puts_oi / 100000).toFixed(2)),
+        putsCoi: parseFloat((element.puts_change_oi / 100000).toFixed(2)),
       });
     }
   });
   res.send(oiData);
+});
+
+app.get("/total-coi/:symbol", async (req, res) => {
+  const symbol = req.params.symbol;
+
+  const Total = mongoose.model(symbol, oiDataSchema, symbol);
+
+  const data = await Total.findOne({ strikePrice: 0 }).catch(errorHandler);
+  if (data !== null) {
+    const oi = data.oiArray;
+    const oiLacs = oi.map((element) => {
+      const time = element.time;
+      const putLac = parseFloat((element.putsCoi / 100000).toFixed(2));
+      const callLac = parseFloat((element.callsCoi / 100000).toFixed(2));
+      const pcr = parseFloat((putLac / callLac).toFixed(2));
+      const oidiff = putLac - callLac;
+      const eleLacs = {
+        pcr: pcr,
+        oidiff: oidiff,
+        time: time,
+        putsCoi: putLac,
+        callsCoi: callLac,
+      };
+      return eleLacs;
+    });
+    res.send(oiLacs);
+  }
 });
 
 //* listening on port
