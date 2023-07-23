@@ -31,7 +31,7 @@ const CoiLineChart = ({ mode, symbol, type }) => {
     return () => {
       clearInterval(intervalId);
     };
-  }, []);
+  }, [symbol]);
 
   const fill = mode === "light" ? "#8c8c8c" : "#d9d9d9";
   const toolbg =

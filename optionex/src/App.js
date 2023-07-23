@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
+import InputBox from "./components/InputBox";
 import CoiLineChart from "./components/CoiLineChart";
 import OiCoiBarChart from "./components/OiCoiBarChart";
 import DataTable from "./components/DataTable";
@@ -11,14 +12,25 @@ const Theme = createTheme({
   },
 });
 
-const symbol = "NIFTY";
 const expiryDate = "current";
 
 function App() {
+  const [symbol, setSymbol] = useState("NIFTY");
+
+  function handleChange(e, newValue) {
+    if (newValue != null) {
+      setSymbol(newValue);
+    }
+  }
+
   return (
     <ThemeProvider theme={Theme}>
       <CssBaseline />
-      {/* <main>
+      <main>
+        <div>
+          <InputBox handleChange={handleChange} />
+          <DataTable mode={Theme.palette.mode} symbol={symbol} />
+        </div>
         <div>
           <CoiLineChart
             mode={Theme.palette.mode}
@@ -46,10 +58,7 @@ function App() {
             expiryDate={expiryDate}
           />
         </div>
-      </main> */}
-      <div>
-        <DataTable mode={Theme.palette.mode} symbol={symbol} />
-      </div>
+      </main>
     </ThemeProvider>
   );
 }

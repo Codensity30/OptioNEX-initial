@@ -44,7 +44,7 @@ export default function BasicTable({ mode, symbol }) {
     return () => {
       clearInterval(intervalId);
     };
-  }, []);
+  }, [symbol]);
 
   return (
     <TableContainer component={Paper}>
