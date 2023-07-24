@@ -34,6 +34,7 @@ const symbolListSchema = new mongoose.Schema({
 
 //* type of object within the oiArray
 const oi = {
+  spot: Number,
   time: String,
   putsCoi: Number,
   callsCoi: Number,
@@ -108,6 +109,7 @@ async function getAndStore(symbol) {
     //* storing coi of 20 strikes up-down in db
     const doc = await Symbol.findOne({ strikePrice: sp }).catch(errorHandler);
     const oiArray = {
+      spot: spot,
       time: getCurrentISTTime(),
       putsCoi: element.puts_change_oi,
       callsCoi: element.calls_change_oi,
@@ -125,6 +127,7 @@ async function getAndStore(symbol) {
   //* special entry to keep track of the total put and call oi
   const doc = await Symbol.findOne({ strikePrice: 0 }).catch(errorHandler);
   const oiArray = {
+    spot: spot,
     time: getCurrentISTTime(),
     putsCoi: total_puts_change_oi,
     callsCoi: total_calls_change_oi,
@@ -151,14 +154,14 @@ async function clearDb() {
 process.env.TZ = "Asia/Kolkata";
 const dailyDbClearCron = "14 9 * * 1-5";
 const daily5minCron = "*/5 9-15 * * 1-5";
-const canceldaily5minCron = "31 3 * * 1-5";
+//const canceldaily5minCron = "31 3 * * 1-5";
 
 const daily5Min = schedule.scheduleJob(daily5minCron, () => {
   console.log("job is running");
   updateOi();
 });
 
-const canceldaily5min = schedule.cancelJob(daily5Min);
+//const canceldaily5min = schedule.cancelJob(daily5Min);
 
 const dailyDbClear = schedule.scheduleJob(dailyDbClearCron, () => {
   console.log("db is cleared");
@@ -270,11 +273,13 @@ app.get("/total-coi/:symbol", async (req, res) => {
     const oi = data.oiArray;
     const oiLacs = oi.map((element) => {
       const time = element.time;
+      const spot = element.spot;
       const putLac = parseFloat((element.putsCoi / 100000).toFixed(2));
       const callLac = parseFloat((element.callsCoi / 100000).toFixed(2));
       const pcr = parseFloat((putLac / callLac).toFixed(2));
-      const oidiff = putLac - callLac;
+      const oidiff = parseFloat((putLac - callLac).toFixed(2));
       const eleLacs = {
+        spot: spot,
         pcr: pcr,
         oidiff: oidiff,
         time: time,

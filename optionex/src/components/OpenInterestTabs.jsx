@@ -1,0 +1,49 @@
+import React, { useState } from "react";
+import Tabs from "@mui/material/Tabs";
+import Tab from "@mui/material/Tab";
+import Box from "@mui/material/Box";
+import OiCoiBarChart from "./OiCoiBarChart";
+import { Paper } from "@mui/material";
+
+const CustomTabs = ({ mode, symbol, expiryDate }) => {
+  const [selectedTab, setSelectedTab] = useState(0); // State to keep track of selected tab index
+
+  const handleTabChange = (event, newValue) => {
+    setSelectedTab(newValue); // Update the selected tab index when a new tab is selected
+  };
+
+  return (
+    <div>
+      <Tabs
+        value={selectedTab}
+        onChange={handleTabChange}
+        variant="fullWidth"
+        textColor="secondary"
+        indicatorColor="secondary"
+      >
+        <Tab label="Total Open Interest" />
+        <Tab label="Change in Open Interest" />
+      </Tabs>
+      <Box sx={{ display: "flex", justifyContent: "center", py: 5 }}>
+        {selectedTab === 0 && (
+          <OiCoiBarChart
+            symbol={symbol}
+            expiryDate={expiryDate}
+            oicoi="OI"
+            mode={mode}
+          />
+        )}
+        {selectedTab === 1 && (
+          <OiCoiBarChart
+            symbol={symbol}
+            expiryDate={expiryDate}
+            oicoi="COI"
+            mode={mode}
+          />
+        )}
+      </Box>
+    </div>
+  );
+};
+
+export default CustomTabs;

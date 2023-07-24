@@ -29,10 +29,13 @@ export default function InputBox({ handleChange }) {
   return (
     <Autocomplete
       disablePortal
+      defaultValue={"NIFTY"}
       options={symbols}
       sx={{ width: 300 }}
       onChange={handleChange}
-      renderInput={(params) => <TextField {...params} label="Symbols" />}
+      renderInput={(params) => (
+        <TextField {...params} label="Symbols" defaultValue={"NIFTY"} />
+      )}
     />
   );
 }

@@ -1,21 +1,20 @@
 import React, { useState } from "react";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
+import CustomTabs from "./components/CustomTabs";
 import InputBox from "./components/InputBox";
 import CoiLineChart from "./components/CoiLineChart";
 import OiCoiBarChart from "./components/OiCoiBarChart";
 import DataTable from "./components/DataTable";
-
-const Theme = createTheme({
-  palette: {
-    mode: "light",
-  },
-});
+import IconButton from "@mui/material/IconButton";
+import LightModeIconRounded from "@mui/icons-material/LightModeRounded";
+import DarkModeIconRounded from "@mui/icons-material/DarkModeRounded";
 
 const expiryDate = "current";
 
 function App() {
   const [symbol, setSymbol] = useState("NIFTY");
+  const [mode, setMode] = useState("dark");
 
   function handleChange(e, newValue) {
     if (newValue != null) {
@@ -23,40 +22,33 @@ function App() {
     }
   }
 
+  function handleModeChange() {
+    if (mode === "light") setMode("dark");
+    else setMode("light");
+  }
+
+  const Theme = createTheme({
+    palette: {
+      mode: mode,
+    },
+  });
+
   return (
     <ThemeProvider theme={Theme}>
       <CssBaseline />
       <main>
-        <div>
+        <div className="flex justify-center mt-10 gap-5">
           <InputBox handleChange={handleChange} />
-          <DataTable mode={Theme.palette.mode} symbol={symbol} />
+          <IconButton aria-label="mode" onClick={handleModeChange}>
+            {mode === "light" ? (
+              <DarkModeIconRounded />
+            ) : (
+              <LightModeIconRounded />
+            )}
+          </IconButton>
         </div>
-        <div>
-          <CoiLineChart
-            mode={Theme.palette.mode}
-            symbol={symbol}
-            type={"coi"}
-          />
-          <div className="mt-10"></div>
-          <CoiLineChart
-            mode={Theme.palette.mode}
-            symbol={symbol}
-            type={"pcr"}
-          />
-          <div className="mt-10"></div>
-          <OiCoiBarChart
-            oicoi="OI"
-            mode={Theme.palette.mode}
-            symbol={symbol}
-            expiryDate={expiryDate}
-          />
-          <div className="mt-10"></div>
-          <OiCoiBarChart
-            oicoi="COI"
-            mode={Theme.palette.mode}
-            symbol={symbol}
-            expiryDate={expiryDate}
-          />
+        <div className="my-10">
+          <CustomTabs mode={mode} symbol={symbol} expiryDate={expiryDate} />
         </div>
       </main>
     </ThemeProvider>

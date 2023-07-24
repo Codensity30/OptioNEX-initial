@@ -8,19 +8,18 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import {
-  TrendingUp,
-  TrendingDown,
-  East,
-  ArrowCircleUp,
-  ArrowCircleRight,
-  ArrowCircleDown,
-  KeyboardDoubleArrowDown,
-  KeyboardDoubleArrowUp,
+  SouthRounded,
+  EastRounded,
+  NorthRounded,
+  KeyboardDoubleArrowDownRounded,
+  KeyboardDoubleArrowUpRounded,
+  TrendingUpRounded,
+  TrendingDownRounded,
 } from "@mui/icons-material";
 
 const bg = {
   default: { light: "#C5DFF8", dark: "#395B64" },
-  call: { light: "#FFACAC", dark: "#800000" },
+  call: { light: "#FFD1DA", dark: "#800000" },
   put: { light: "#E8FFCE", dark: "#448000" },
   neutral: { light: "#FFFAD7", dark: "#807000" },
 };
@@ -48,7 +47,7 @@ export default function BasicTable({ mode, symbol }) {
 
   return (
     <TableContainer component={Paper}>
-      <Table sx={{ minWidth: 650 }}>
+      <Table sx={{ minWidth: 650 }} stickyHeader aria-label="sticky table">
         <TableHead>
           <TableRow>
             <TableCell
@@ -110,22 +109,19 @@ export default function BasicTable({ mode, symbol }) {
               </TableCell>
               <TableCell align="center">
                 {row.oidiff > 0 ? (
-                  <KeyboardDoubleArrowUp color="success" />
+                  <KeyboardDoubleArrowUpRounded color="success" />
                 ) : (
-                  <KeyboardDoubleArrowDown color="error" />
+                  <KeyboardDoubleArrowDownRounded color="error" />
                 )}
                 {row.oidiff}
               </TableCell>
               <TableCell align="center">
                 {row.pcr >= 1.25 ? (
-                  <ArrowCircleUp sx={{ marginRight: "4px" }} color="success" />
+                  <NorthRounded sx={{ marginRight: "4px" }} color="success" />
                 ) : row.pcr <= 0.75 ? (
-                  <ArrowCircleDown sx={{ marginRight: "4px" }} color="error" />
+                  <SouthRounded sx={{ marginRight: "4px" }} color="error" />
                 ) : (
-                  <ArrowCircleRight
-                    sx={{ marginRight: "4px" }}
-                    color="warning"
-                  />
+                  <EastRounded sx={{ marginRight: "4px" }} color="warning" />
                 )}
                 {row.pcr}
               </TableCell>
@@ -138,7 +134,10 @@ export default function BasicTable({ mode, symbol }) {
                       borderRadius: "20px",
                     }}
                   >
-                    <TrendingUp sx={{ marginRight: "2px" }} color="success" />
+                    <TrendingUpRounded
+                      sx={{ marginRight: "2px" }}
+                      color="success"
+                    />
                     Positive
                   </div>
                 ) : row.pcr <= 0.75 ? (
@@ -148,7 +147,10 @@ export default function BasicTable({ mode, symbol }) {
                       borderRadius: "20px",
                     }}
                   >
-                    <TrendingDown sx={{ marginRight: "2px" }} color="error" />
+                    <TrendingDownRounded
+                      sx={{ marginRight: "2px" }}
+                      color="error"
+                    />
                     Negative
                   </div>
                 ) : (
@@ -158,7 +160,7 @@ export default function BasicTable({ mode, symbol }) {
                       borderRadius: "20px",
                     }}
                   >
-                    <East sx={{ marginRight: "2px" }} color="warning" />
+                    <EastRounded sx={{ marginRight: "2px" }} color="warning" />
                     Neutral
                   </div>
                 )}

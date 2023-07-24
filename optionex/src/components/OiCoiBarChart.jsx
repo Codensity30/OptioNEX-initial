@@ -72,7 +72,7 @@ const OiCoiBarChart = ({ mode, symbol, expiryDate, oicoi }) => {
       <CartesianGrid strokeDasharray="1 1" vertical={false} />
       <Tooltip contentStyle={TooltipStyle} cursor={{ fill: TooltipCursor }} />
       <Legend iconType="triangle" />
-      <ReferenceLine x={data[0].atm} stroke="grey" strokeDasharray="3 3" />
+      <ReferenceLine x={data[0].atm} stroke={fill} strokeDasharray="2 3" />
       <Bar
         name={`PUTS ${oicoi}`}
         dot={false}

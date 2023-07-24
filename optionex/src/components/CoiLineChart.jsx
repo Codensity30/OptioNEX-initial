@@ -46,50 +46,17 @@ const CoiLineChart = ({ mode, symbol, type }) => {
     border: "1px solid rgba(200, 200, 200, 0.4)",
   };
 
-  if (type === "pcr") {
-    return (
-      <LineChart width={800} height={500} data={data}>
-        <XAxis dataKey="time" tickLine={false} tick={{ fill: fill }} />
-        <YAxis
-          tickLine={false}
-          axisLine={false}
-          tick={{ fill: fill }}
-          domain={["auto", "auto"]}
-        >
-          <Label
-            value="PCR vs Time"
-            angle={-90}
-            position={"insideLeft"}
-            fill={fill}
-          />
-        </YAxis>
-        <CartesianGrid strokeDasharray="1 1" vertical={false} />
-        <Tooltip contentStyle={TooltipStyle} />
-        <ReferenceLine
-          y={0}
-          stroke="purple"
-          label="Base"
-          strokeDasharray="3 3"
-        />
-        <Legend iconType="triangle" />
-        <Line
-          name="PCR"
-          dot={false}
-          type="monotone"
-          dataKey="pcr"
-          stroke="#4FC0D0"
-          strokeWidth={2}
-        />
-      </LineChart>
-    );
-  }
-
   return (
-    <LineChart width={800} height={500} data={data}>
-      <XAxis dataKey="time" tickLine={false} tick={{ fill: fill }} />
+    <LineChart width={1000} height={500} data={data}>
+      <XAxis
+        dataKey="time"
+        tickLine={false}
+        tick={{ fill: fill }}
+        padding={{ left: 30 }}
+      />
       <YAxis tickLine={false} axisLine={false} tick={{ fill: fill }}>
         <Label
-          value="COI vs Time"
+          value={type === "pcr" ? "PCR vs Time" : "COI vs Time"}
           angle={-90}
           position={"insideLeft"}
           fill={fill}
@@ -98,32 +65,51 @@ const CoiLineChart = ({ mode, symbol, type }) => {
       </YAxis>
       <CartesianGrid strokeDasharray="1 1" vertical={false} />
       <Tooltip contentStyle={TooltipStyle} />
-      <ReferenceLine y={0} stroke="purple" label="Base" strokeDasharray="3 3" />
+
       <Legend iconType="triangle" />
-      <Line
-        name="Puts COI"
-        dot={false}
-        type="monotone"
-        dataKey="putsCoi"
-        stroke="#03C988"
-        strokeWidth={2}
-      />
-      <Line
-        name="Calls COI"
-        dot={false}
-        type="monotone"
-        dataKey="callsCoi"
-        stroke="#FF8787"
-        strokeWidth={2}
-      />
-      <Line
-        name="Difference"
-        dot={false}
-        type="monotone"
-        dataKey="oidiff"
-        stroke="#F3AA60"
-        strokeWidth={2}
-      />
+      {type === "pcr" ? (
+        <Line
+          name="PCR"
+          dot={false}
+          type="monotone"
+          dataKey="pcr"
+          stroke="#4FC0D0"
+          strokeWidth={2}
+        />
+      ) : (
+        <>
+          <ReferenceLine
+            y={0}
+            stroke="purple"
+            label="Base"
+            strokeDasharray="3 3"
+          />
+          <Line
+            name="Puts COI"
+            dot={false}
+            type="monotone"
+            dataKey="putsCoi"
+            stroke="#03C988"
+            strokeWidth={2}
+          />
+          <Line
+            name="Calls COI"
+            dot={false}
+            type="monotone"
+            dataKey="callsCoi"
+            stroke="#FF8787"
+            strokeWidth={2}
+          />
+          <Line
+            name="Difference"
+            dot={false}
+            type="monotone"
+            dataKey="oidiff"
+            stroke="#F3AA60"
+            strokeWidth={2}
+          />
+        </>
+      )}
     </LineChart>
   );
 };
