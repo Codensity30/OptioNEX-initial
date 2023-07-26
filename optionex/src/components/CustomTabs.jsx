@@ -10,6 +10,7 @@ import {
   QueryStatsRounded,
   StackedLineChartRounded,
 } from "@mui/icons-material";
+import MultiStrikeTabs from "./MultiStrikeTabs";
 
 const CustomTabs = ({ mode, symbol, expiryDate }) => {
   const [selectedTab, setSelectedTab] = useState(0);
@@ -17,6 +18,14 @@ const CustomTabs = ({ mode, symbol, expiryDate }) => {
   const handleTabChange = (event, newValue) => {
     setSelectedTab(newValue);
   };
+
+  const disabled =
+    symbol === "NIFTY" ||
+    symbol === "BANKNIFTY" ||
+    symbol === "FINNIFTY" ||
+    symbol === "MIDCPNIFTY"
+      ? false
+      : true;
 
   return (
     <div style={{ width: "full", display: "flex", justifyContent: "center" }}>
@@ -28,6 +37,7 @@ const CustomTabs = ({ mode, symbol, expiryDate }) => {
             iconPosition="start"
           />
           <Tab
+            disabled={disabled}
             label="Buildup vs Time"
             icon={<QueryStatsRounded />}
             iconPosition="start"
@@ -47,6 +57,7 @@ const CustomTabs = ({ mode, symbol, expiryDate }) => {
             />
           )}
           {selectedTab === 1 && <DataVsTimeTabs symbol={symbol} mode={mode} />}
+          {selectedTab === 2 && <MultiStrikeTabs symbol={symbol} mode={mode} />}
         </Box>
       </Paper>
     </div>

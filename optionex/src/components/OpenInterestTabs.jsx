@@ -3,7 +3,6 @@ import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Box from "@mui/material/Box";
 import OiCoiBarChart from "./OiCoiBarChart";
-import { Paper } from "@mui/material";
 import { BarChartRounded, StackedBarChartRounded } from "@mui/icons-material";
 
 const CustomTabs = ({ mode, symbol, expiryDate }) => {

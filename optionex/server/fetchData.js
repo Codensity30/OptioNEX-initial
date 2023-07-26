@@ -77,67 +77,70 @@ async function getAndStore(symbol) {
     })
     .catch(errorHandler);
 
-  //* creating mongoose model with collection name same as symbol
-  const Symbol = mongoose.model(symbol, oiDataSchema, symbol);
+  if (response.data.length !== 0) {
+    //* creating mongoose model with collection name same as symbol
+    const Symbol = mongoose.model(symbol, oiDataSchema, symbol);
 
-  //* parsing response from api to get the option data
-  const opDatas = response.data.resultData.opDatas;
+    //* parsing response from api to get the option data
+    const opDatas = response.data.resultData.opDatas;
 
-  //* important vaiables required
-  const spot = opDatas[0].index_close;
+    //* important vaiables required
+    const spot = opDatas[0].index_close;
 
-  opDatas.sort((a, b) => {
-    return a.strike_price < b.strike_price;
-  });
+    opDatas.sort((a, b) => {
+      return a.strike_price < b.strike_price;
+    });
 
-  const atmIndex = opDatas.findIndex((obj) => obj.strike_price > spot);
-  let total_puts_change_oi = 0;
-  let total_calls_change_oi = 0;
+    const atmIndex = opDatas.findIndex((obj) => obj.strike_price > spot);
+    let total_puts_change_oi = 0;
+    let total_calls_change_oi = 0;
 
-  //* entry of all sp lying in range of 1000 points up and down
-  const start = Math.max(0, atmIndex - 20);
-  const end = Math.min(opDatas.length - 1, atmIndex + 20);
-  for (let i = start; i <= end; i++) {
-    const element = opDatas[i];
-    const sp = element.strike_price;
+    //* entry of all sp lying in range of 1000 points up and down
+    const start = Math.max(0, atmIndex - 20);
+    const end = Math.min(opDatas.length - 1, atmIndex + 20);
+    for (let i = start; i <= end; i++) {
+      const element = opDatas[i];
+      const sp = element.strike_price;
 
-    //* suming up coi of 10 strikes up-down
-    if (Math.abs(i - atmIndex) <= 10) {
-      total_puts_change_oi += element.puts_change_oi;
-      total_calls_change_oi += element.calls_change_oi;
+      //* suming up coi of 10 strikes up-down
+      if (Math.abs(i - atmIndex) <= 10) {
+        total_puts_change_oi += element.puts_change_oi;
+        total_calls_change_oi += element.calls_change_oi;
+      }
+      //* storing coi of 20 strikes up-down in db
+      const doc = await Symbol.findOne({ strikePrice: sp }).catch(errorHandler);
+      const oiArray = {
+        spot: spot,
+        time: getCurrentISTTime(),
+        putsCoi: element.puts_change_oi,
+        callsCoi: element.calls_change_oi,
+      };
+
+      if (!doc) {
+        await Symbol.create({ strikePrice: sp, oiArray }).catch(errorHandler);
+      } else {
+        await Symbol.updateOne(
+          { strikePrice: sp },
+          { $push: { oiArray } }
+        ).catch(errorHandler);
+      }
     }
-    //* storing coi of 20 strikes up-down in db
-    const doc = await Symbol.findOne({ strikePrice: sp }).catch(errorHandler);
+
+    //* special entry to keep track of the total put and call oi
+    const doc = await Symbol.findOne({ strikePrice: 0 }).catch(errorHandler);
     const oiArray = {
       spot: spot,
       time: getCurrentISTTime(),
-      putsCoi: element.puts_change_oi,
-      callsCoi: element.calls_change_oi,
+      putsCoi: total_puts_change_oi,
+      callsCoi: total_calls_change_oi,
     };
-
     if (!doc) {
-      await Symbol.create({ strikePrice: sp, oiArray }).catch(errorHandler);
+      await Symbol.create({ strikePrice: 0, oiArray }).catch(errorHandler);
     } else {
-      await Symbol.updateOne({ strikePrice: sp }, { $push: { oiArray } }).catch(
+      await Symbol.updateOne({ strikePrice: 0 }, { $push: { oiArray } }).catch(
         errorHandler
       );
     }
-  }
-
-  //* special entry to keep track of the total put and call oi
-  const doc = await Symbol.findOne({ strikePrice: 0 }).catch(errorHandler);
-  const oiArray = {
-    spot: spot,
-    time: getCurrentISTTime(),
-    putsCoi: total_puts_change_oi,
-    callsCoi: total_calls_change_oi,
-  };
-  if (!doc) {
-    await Symbol.create({ strikePrice: 0, oiArray }).catch(errorHandler);
-  } else {
-    await Symbol.updateOne({ strikePrice: 0 }, { $push: { oiArray } }).catch(
-      errorHandler
-    );
   }
 }
 
@@ -250,7 +253,7 @@ app.get("/symbol-store", async (req, res) => {
 });
 
 //* endpoint to fetch the live oi data of the specified expiry
-app.get("/live-oicoi-ex/:symbol/:exiryDate", async (req, res) => {
+app.get("/live-oicoi-ex/:symbol/:expiryDate", async (req, res) => {
   const { symbol, expiryDate } = req.params;
 
   const url = "https://webapi.niftytrader.in/webapi/option/fatch-option-chain";
@@ -267,10 +270,10 @@ app.get("/live-oicoi-ex/:symbol/:exiryDate", async (req, res) => {
 
   let strikeDiff = 1e9;
 
-  for (let i = 11; i < opDatas.length; i++) {
+  for (let i = 21; i < opDatas.length; i++) {
     strikeDiff = Math.min(
       strikeDiff,
-      Math.abs(opDatas[10].strike_price - opDatas[i].strike_price)
+      Math.abs(opDatas[20].strike_price - opDatas[i].strike_price)
     );
   }
 
@@ -292,6 +295,19 @@ app.get("/live-oicoi-ex/:symbol/:exiryDate", async (req, res) => {
   res.send(oiData);
 });
 
+app.get("/expiry-dates/:symbol", async (req, res) => {
+  const symbol = req.params.symbol;
+  const url = "https://webapi.niftytrader.in/webapi/option/fatch-option-chain";
+  const response = await axios
+    .get(url, {
+      params: { symbol: symbol, expiryDate: "current" },
+    })
+    .catch(errorHandler);
+
+  const expDates = response.data.resultData.opExpiryDates;
+  res.send(expDates);
+});
+
 app.get("/total-coi/:symbol", async (req, res) => {
   const symbol = req.params.symbol;
 
@@ -305,8 +321,9 @@ app.get("/total-coi/:symbol", async (req, res) => {
       const spot = element.spot;
       const putLac = parseFloat((element.putsCoi / 100000).toFixed(2));
       const callLac = parseFloat((element.callsCoi / 100000).toFixed(2));
-      const pcr = parseFloat((putLac / callLac).toFixed(2));
+      let pcr = Math.abs(parseFloat((putLac / callLac).toFixed(2)));
       const oidiff = parseFloat((putLac - callLac).toFixed(2));
+      pcr = oidiff > 0 ? pcr : -1 * pcr;
       const eleLacs = {
         spot: spot,
         pcr: pcr,
@@ -319,6 +336,39 @@ app.get("/total-coi/:symbol", async (req, res) => {
     });
     res.send(oiLacs);
   }
+});
+
+app.get("/strikes/:symbol", async (req, res) => {
+  const symbol = req.params.symbol;
+  const url = "https://webapi.niftytrader.in/webapi/option/fatch-option-chain";
+
+  const response = await axios
+    .get(url, {
+      params: { symbol: symbol },
+    })
+    .catch(errorHandler);
+
+  const opDatas = response.data.resultData.opDatas;
+  const spot = opDatas[0].index_close;
+  const strikes = [];
+
+  let strikeDiff = 1e9;
+
+  for (let i = 21; i < opDatas.length; i++) {
+    strikeDiff = Math.min(
+      strikeDiff,
+      Math.abs(opDatas[20].strike_price - opDatas[i].strike_price)
+    );
+  }
+
+  const atm = Math.ceil(spot / strikeDiff) * strikeDiff;
+  strikes.push(atm);
+  for (let i = 1; i <= 5; i++) {
+    strikes.push(atm - i * strikeDiff);
+    strikes.push(atm + i * strikeDiff);
+  }
+  strikes.sort();
+  res.send(strikes);
 });
 
 //* listening on port

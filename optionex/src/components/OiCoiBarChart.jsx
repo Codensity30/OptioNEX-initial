@@ -34,7 +34,7 @@ const OiCoiBarChart = ({ mode, symbol, expiryDate, oicoi }) => {
     return () => {
       clearInterval(intervalId);
     };
-  }, [symbol]);
+  }, [symbol, expiryDate]);
 
   const fill = mode === "light" ? "#8c8c8c" : "#d9d9d9";
   const toolbg =

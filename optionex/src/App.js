@@ -3,22 +3,24 @@ import { ThemeProvider, createTheme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import CustomTabs from "./components/CustomTabs";
 import InputBox from "./components/InputBox";
-import CoiLineChart from "./components/CoiLineChart";
-import OiCoiBarChart from "./components/OiCoiBarChart";
-import DataTable from "./components/DataTable";
+import ExpiryBox from "./components/ExpiryBox";
 import IconButton from "@mui/material/IconButton";
 import LightModeIconRounded from "@mui/icons-material/LightModeRounded";
 import DarkModeIconRounded from "@mui/icons-material/DarkModeRounded";
 
-const expiryDate = "current";
-
 function App() {
   const [symbol, setSymbol] = useState("NIFTY");
+  const [expiryDate, setExpiry] = useState("current");
   const [mode, setMode] = useState("dark");
 
-  function handleChange(e, newValue) {
+  function handleSymbolChange(e, newValue) {
     if (newValue != null) {
       setSymbol(newValue);
+    }
+  }
+  function handleExpiryChange(e, newValue) {
+    if (newValue != null) {
+      setExpiry(newValue);
     }
   }
 
@@ -38,7 +40,8 @@ function App() {
       <CssBaseline />
       <main>
         <div className="flex justify-center mt-10 gap-5">
-          <InputBox handleChange={handleChange} />
+          <InputBox handleChange={handleSymbolChange} />
+          <ExpiryBox handleChange={handleExpiryChange} symbol={symbol} />
           <IconButton aria-label="mode" onClick={handleModeChange}>
             {mode === "light" ? (
               <DarkModeIconRounded />
