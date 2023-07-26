@@ -10,6 +10,7 @@ import {
   Legend,
   Label,
   ReferenceLine,
+  ResponsiveContainer,
 } from "recharts";
 
 const OiCoiBarChart = ({ mode, symbol, expiryDate, oicoi }) => {
@@ -54,42 +55,44 @@ const OiCoiBarChart = ({ mode, symbol, expiryDate, oicoi }) => {
   }
 
   return (
-    <BarChart width={1000} height={500} data={data} barCategoryGap={"20%"}>
-      <XAxis dataKey="strikePrice" tickLine={false} tick={{ fill: fill }} />
-      <YAxis
-        tickLine={false}
-        axisLine={false}
-        type="number"
-        tick={{ fill: fill }}
-      >
-        <Label
-          value={oicoi === "OI" ? "Open Intrest" : "Change in OI"}
-          angle={-90}
-          position={"insideLeft"}
-          fill={fill}
+    <ResponsiveContainer width="98%" height={500}>
+      <BarChart data={data} barCategoryGap={"20%"}>
+        <XAxis dataKey="strikePrice" tickLine={false} tick={{ fill: fill }} />
+        <YAxis
+          tickLine={false}
+          axisLine={false}
+          type="number"
+          tick={{ fill: fill }}
+        >
+          <Label
+            value={oicoi === "OI" ? "Open Intrest" : "Change in OI"}
+            angle={-90}
+            position={"insideLeft"}
+            fill={fill}
+          />
+        </YAxis>
+        <CartesianGrid strokeDasharray="1 1" vertical={false} />
+        <Tooltip contentStyle={TooltipStyle} cursor={{ fill: TooltipCursor }} />
+        <Legend iconType="triangle" />
+        <ReferenceLine x={data[0].atm} stroke={fill} strokeDasharray="2 3" />
+        <Bar
+          name={`PUTS ${oicoi}`}
+          dot={false}
+          type="monotone"
+          dataKey={oicoi === "OI" ? "putsOi" : "putsCoi"}
+          fill="#03C988"
+          unit={" L"}
         />
-      </YAxis>
-      <CartesianGrid strokeDasharray="1 1" vertical={false} />
-      <Tooltip contentStyle={TooltipStyle} cursor={{ fill: TooltipCursor }} />
-      <Legend iconType="triangle" />
-      <ReferenceLine x={data[0].atm} stroke={fill} strokeDasharray="2 3" />
-      <Bar
-        name={`PUTS ${oicoi}`}
-        dot={false}
-        type="monotone"
-        dataKey={oicoi === "OI" ? "putsOi" : "putsCoi"}
-        fill="#03C988"
-        unit={" L"}
-      />
-      <Bar
-        name={`CALLS ${oicoi}`}
-        dot={false}
-        type="monotone"
-        dataKey={oicoi === "OI" ? "callsOi" : "callsCoi"}
-        fill="#FF8787"
-        unit={" L"}
-      />
-    </BarChart>
+        <Bar
+          name={`CALLS ${oicoi}`}
+          dot={false}
+          type="monotone"
+          dataKey={oicoi === "OI" ? "callsOi" : "callsCoi"}
+          fill="#FF8787"
+          unit={" L"}
+        />
+      </BarChart>
+    </ResponsiveContainer>
   );
 };
 

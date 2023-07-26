@@ -4,6 +4,11 @@ import Tab from "@mui/material/Tab";
 import Box from "@mui/material/Box";
 import CoiLineChart from "./CoiLineChart";
 import DataTable from "./DataTable";
+import {
+  InsightsRounded,
+  TableChartRounded,
+  TimelineRounded,
+} from "@mui/icons-material";
 
 const CustomTabs = ({ mode, symbol }) => {
   const [selectedTab, setSelectedTab] = useState(0); // State to keep track of selected tab index
@@ -21,16 +26,28 @@ const CustomTabs = ({ mode, symbol }) => {
         textColor="secondary"
         indicatorColor="secondary"
       >
-        <Tab label="Data" />
-        <Tab label="COI vs Time" />
-        <Tab label="PCR vs Time" />
+        <Tab
+          label="Buildup"
+          icon={<TableChartRounded />}
+          iconPosition="start"
+        />
+        <Tab
+          label="COI vs Time"
+          icon={<InsightsRounded />}
+          iconPosition="start"
+        />
+        <Tab
+          label="PCR vs Time"
+          icon={<TimelineRounded />}
+          iconPosition="start"
+        />
       </Tabs>
       <Box
         sx={{
           display: "flex",
           justifyContent: "center",
           py: 5,
-          height: "100%",
+          height: "95%",
         }}
       >
         {selectedTab === 0 && <DataTable symbol={symbol} mode={mode} />}

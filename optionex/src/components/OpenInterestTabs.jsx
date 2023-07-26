@@ -4,6 +4,7 @@ import Tab from "@mui/material/Tab";
 import Box from "@mui/material/Box";
 import OiCoiBarChart from "./OiCoiBarChart";
 import { Paper } from "@mui/material";
+import { BarChartRounded, StackedBarChartRounded } from "@mui/icons-material";
 
 const CustomTabs = ({ mode, symbol, expiryDate }) => {
   const [selectedTab, setSelectedTab] = useState(0); // State to keep track of selected tab index
@@ -21,8 +22,16 @@ const CustomTabs = ({ mode, symbol, expiryDate }) => {
         textColor="secondary"
         indicatorColor="secondary"
       >
-        <Tab label="Total Open Interest" />
-        <Tab label="Change in Open Interest" />
+        <Tab
+          label="Total Open Interest"
+          icon={<BarChartRounded />}
+          iconPosition="start"
+        />
+        <Tab
+          label="Change in Open Interest"
+          icon={<StackedBarChartRounded />}
+          iconPosition="start"
+        />
       </Tabs>
       <Box sx={{ display: "flex", justifyContent: "center", py: 5 }}>
         {selectedTab === 0 && (

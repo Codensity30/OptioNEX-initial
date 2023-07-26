@@ -10,6 +10,7 @@ import {
   Legend,
   Label,
   ReferenceLine,
+  ResponsiveContainer,
 } from "recharts";
 
 const CoiLineChart = ({ mode, symbol, type }) => {
@@ -47,70 +48,72 @@ const CoiLineChart = ({ mode, symbol, type }) => {
   };
 
   return (
-    <LineChart width={1000} height={500} data={data}>
-      <XAxis
-        dataKey="time"
-        tickLine={false}
-        tick={{ fill: fill }}
-        padding={{ left: 30 }}
-      />
-      <YAxis tickLine={false} axisLine={false} tick={{ fill: fill }}>
-        <Label
-          value={type === "pcr" ? "PCR vs Time" : "COI vs Time"}
-          angle={-90}
-          position={"insideLeft"}
-          fill={fill}
-          domain={["auto", "auto"]}
+    <ResponsiveContainer width="98%" height={500}>
+      <LineChart data={data}>
+        <XAxis
+          dataKey="time"
+          tickLine={false}
+          tick={{ fill: fill }}
+          padding={{ left: 30 }}
         />
-      </YAxis>
-      <CartesianGrid strokeDasharray="1 1" vertical={false} />
-      <Tooltip contentStyle={TooltipStyle} />
+        <YAxis tickLine={false} axisLine={false} tick={{ fill: fill }}>
+          <Label
+            value={type === "pcr" ? "PCR vs Time" : "COI vs Time"}
+            angle={-90}
+            position={"insideLeft"}
+            fill={fill}
+            domain={["auto", "auto"]}
+          />
+        </YAxis>
+        <CartesianGrid strokeDasharray="1 1" vertical={false} />
+        <Tooltip contentStyle={TooltipStyle} />
 
-      <Legend iconType="triangle" />
-      {type === "pcr" ? (
-        <Line
-          name="PCR"
-          dot={false}
-          type="monotone"
-          dataKey="pcr"
-          stroke="#4FC0D0"
-          strokeWidth={2}
-        />
-      ) : (
-        <>
-          <ReferenceLine
-            y={0}
-            stroke="purple"
-            label="Base"
-            strokeDasharray="3 3"
-          />
+        <Legend iconType="triangle" />
+        {type === "pcr" ? (
           <Line
-            name="Puts COI"
+            name="PCR"
             dot={false}
             type="monotone"
-            dataKey="putsCoi"
-            stroke="#03C988"
+            dataKey="pcr"
+            stroke="#4FC0D0"
             strokeWidth={2}
           />
-          <Line
-            name="Calls COI"
-            dot={false}
-            type="monotone"
-            dataKey="callsCoi"
-            stroke="#FF8787"
-            strokeWidth={2}
-          />
-          <Line
-            name="Difference"
-            dot={false}
-            type="monotone"
-            dataKey="oidiff"
-            stroke="#F3AA60"
-            strokeWidth={2}
-          />
-        </>
-      )}
-    </LineChart>
+        ) : (
+          <>
+            <ReferenceLine
+              y={0}
+              stroke="purple"
+              label="Base"
+              strokeDasharray="3 3"
+            />
+            <Line
+              name="Puts COI"
+              dot={false}
+              type="monotone"
+              dataKey="putsCoi"
+              stroke="#03C988"
+              strokeWidth={2}
+            />
+            <Line
+              name="Calls COI"
+              dot={false}
+              type="monotone"
+              dataKey="callsCoi"
+              stroke="#FF8787"
+              strokeWidth={2}
+            />
+            <Line
+              name="Difference"
+              dot={false}
+              type="monotone"
+              dataKey="oidiff"
+              stroke="#F3AA60"
+              strokeWidth={2}
+            />
+          </>
+        )}
+      </LineChart>
+    </ResponsiveContainer>
   );
 };
 

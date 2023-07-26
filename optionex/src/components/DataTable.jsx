@@ -33,6 +33,7 @@ export default function BasicTable({ mode, symbol }) {
         const response = await axios.get(
           `http://localhost:8000/total-coi/${symbol}`
         );
+        response.data.reverse();
         setData(response.data);
       } catch (error) {
         console.error("Error fetching data: ", error);

@@ -149,23 +149,35 @@ async function clearDb() {
   await mongoose.connection.db.dropDatabase().catch(errorHandler);
 }
 
+async function storeSymbol() {
+  await axios.get("http://localhost:8000/symbol-store").catch(errorHandler);
+}
+
 //* sheduling jobs to run at certain interval and time
 
 process.env.TZ = "Asia/Kolkata";
 const dailyDbClearCron = "14 9 * * 1-5";
-const daily5minCron = "*/5 9-15 * * 1-5";
-//const canceldaily5minCron = "31 3 * * 1-5";
+
+const firstHourCron = "15-59/5 9 * * 1-5";
+const daily5minCron = "*/5 10-14 * * 1-5";
+const lastHourCron = "0-30/5 15 * * 1-5";
 
 const daily5Min = schedule.scheduleJob(daily5minCron, () => {
   console.log("job is running");
   updateOi();
 });
-
-//const canceldaily5min = schedule.cancelJob(daily5Min);
-
+const firstHour = schedule.scheduleJob(firstHourCron, () => {
+  console.log("job is running");
+  updateOi();
+});
+const lastHour = schedule.scheduleJob(lastHourCron, () => {
+  console.log("job is running");
+  updateOi();
+});
 const dailyDbClear = schedule.scheduleJob(dailyDbClearCron, () => {
-  console.log("db is cleared");
   clearDb();
+  console.log("db is cleared");
+  storeSymbol();
 });
 
 //! ROUTING -------------------------------------------------------
@@ -183,34 +195,8 @@ app.get("/update-oiData", async (req, res) => {
   res.send("Initialize the database");
 });
 
-//* endpoint to record symbols lists in database
 app.get("/symbol-list", async (req, res) => {
-  const url = "https://webapi.niftytrader.in/webapi/symbol/psymbol-list";
-
-  const response = await axios.get(url).catch(errorHandler);
-  const data = response.data.resultData;
-
   const Symbol = mongoose.model("symbol_list", symbolListSchema);
-
-  data.forEach(async (element) => {
-    const doc = await Symbol.findOne({ symbolName: element.symbol_name }).catch(
-      errorHandler
-    );
-    if (!doc) {
-      await Symbol.create({
-        symbolName: element.symbol_name,
-        lotSize: element.lot_size,
-      });
-    } else {
-      await Symbol.updateOne(
-        { symbolName: element.symbol_name },
-        {
-          lotSize: element.lot_size,
-        }
-      );
-    }
-  });
-
   const symObj = await Symbol.find({}).catch(errorHandler);
   const symList = [];
   symObj.forEach((element) => {
@@ -218,6 +204,49 @@ app.get("/symbol-list", async (req, res) => {
   });
 
   res.send(symList);
+});
+
+//* endpoint to record symbols lists in database
+app.get("/symbol-store", async (req, res) => {
+  const url = "https://webapi.niftytrader.in/webapi/symbol/psymbol-list";
+
+  const response = await axios.get(url).catch(errorHandler);
+  const data = response.data.resultData;
+
+  const Symbol = mongoose.model("symbol_list", symbolListSchema);
+
+  await Symbol.collection.drop().catch(errorHandler);
+
+  data.forEach(async (element) => {
+    await Symbol.create({
+      symbolName: element.symbol_name,
+      lotSize: element.lot_size,
+    });
+    // const doc = await Symbol.findOne({ symbolName: element.symbol_name }).catch(
+    //   errorHandler
+    // );
+    // if (!doc) {
+    //   await Symbol.create({
+    //     symbolName: element.symbol_name,
+    //     lotSize: element.lot_size,
+    //   });
+    // } else {
+    //   await Symbol.updateOne(
+    //     { symbolName: element.symbol_name },
+    //     {
+    //       lotSize: element.lot_size,
+    //     }
+    //   );
+    // }
+  });
+
+  // const symObj = await Symbol.find({}).catch(errorHandler);
+  // const symList = [];
+  // symObj.forEach((element) => {
+  //   symList.push(element.symbolName);
+  // });
+
+  res.send("Symbols stored");
 });
 
 //* endpoint to fetch the live oi data of the specified expiry
