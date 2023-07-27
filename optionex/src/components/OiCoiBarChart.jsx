@@ -65,6 +65,7 @@ const OiCoiBarChart = ({ mode, symbol, expiryDate, oicoi }) => {
           tick={{ fill: fill }}
         >
           <Label
+            style={{ textAnchor: "middle" }}
             value={oicoi === "OI" ? "Open Intrest" : "Change in OI"}
             angle={-90}
             position={"insideLeft"}

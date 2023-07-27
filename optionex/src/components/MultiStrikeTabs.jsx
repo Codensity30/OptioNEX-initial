@@ -1,9 +1,10 @@
 import { React, useEffect, useState } from "react";
 import Checkbox from "@mui/material/Checkbox";
 import FormControlLabel from "@mui/material/FormControlLabel";
+import MultiStrikeLineChart from "./MultiStrikeLineChart";
 import axios from "axios";
 
-function MultiStrikeTabs({ symbol }) {
+function MultiStrikeTabs({ symbol, mode }) {
   const [checkedStrikes, setCheckedStrikes] = useState([]);
 
   const handleCheckboxChange = (strike) => {
@@ -14,8 +15,6 @@ function MultiStrikeTabs({ symbol }) {
     }
   };
 
-  console.log(checkedStrikes);
-
   const [isDataFetched, setIsDataFetched] = useState(false);
   const [strikes, setStrikes] = useState([]);
 
@@ -23,7 +22,7 @@ function MultiStrikeTabs({ symbol }) {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:8000/strikes/${symbol}`
+          `http://localhost:8000/strikes-list/${symbol}`
         );
         setStrikes(response.data);
         setIsDataFetched(true);
@@ -44,18 +43,26 @@ function MultiStrikeTabs({ symbol }) {
 
   return (
     <>
-      {strikes.map((strike) => (
-        <FormControlLabel
-          control={
-            <Checkbox
-              color="secondary"
-              checked={checkedStrikes.includes(strike)}
-              onChange={() => handleCheckboxChange(strike)}
-            />
-          }
-          label={strike}
-        />
-      ))}
+      <div style={{ display: "flex", justifyContent: "center" }}>
+        {strikes.map((strike, index) => (
+          <FormControlLabel
+            control={
+              <Checkbox
+                key={index}
+                color="secondary"
+                checked={checkedStrikes.includes(strike)}
+                onChange={() => handleCheckboxChange(strike)}
+              />
+            }
+            label={strike}
+          />
+        ))}
+      </div>
+      <MultiStrikeLineChart
+        symbol={symbol}
+        mode={mode}
+        checkedStrikes={checkedStrikes}
+      />
     </>
   );
 }

@@ -13,26 +13,33 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-const CoiLineChart = ({ mode, symbol, strike }) => {
-  const [data, setData] = useState([]);
+const CoiLineChart = ({ mode, symbol, checkedStrikes }) => {
+  const [strikeData, setStrikeData] = useState({});
 
   useEffect(() => {
-    const fetchData = async () => {
+    // Define a function to fetch data for a specific strike
+    const fetchDataForStrike = async (strike) => {
       try {
         const response = await axios.get(
-          `http://localhost:8000/total-coi/${symbol}`
+          `http://localhost:8000/sp-data/${symbol}/${strike}`
         );
-        setData(response.data);
+        setStrikeData((prevData) => ({ ...prevData, [strike]: response.data }));
       } catch (error) {
-        console.error("Error fetching data: ", error);
+        console.error(`Error fetching data for ${strike}:`, error);
       }
     };
-    fetchData();
-    const intervalId = setInterval(fetchData, 60000);
+
+    // Fetch data for all checked strikes
+    checkedStrikes.forEach((strike) => fetchDataForStrike(strike));
+
+    const intervalId = setInterval(() => {
+      checkedStrikes.forEach((strike) => fetchDataForStrike(strike));
+    }, 60000);
+
     return () => {
       clearInterval(intervalId);
     };
-  }, [symbol]);
+  }, [symbol, checkedStrikes]);
 
   const fill = mode === "light" ? "#8c8c8c" : "#d9d9d9";
   const toolbg =
@@ -49,20 +56,22 @@ const CoiLineChart = ({ mode, symbol, strike }) => {
 
   return (
     <ResponsiveContainer width="98%" height={500}>
-      <LineChart data={data}>
+      <LineChart data={Object.values(strikeData)}>
         <XAxis
           dataKey="time"
+          type="category"
+          allowDuplicatedCategory={false}
           tickLine={false}
           tick={{ fill: fill }}
           padding={{ left: 30 }}
         />
         <YAxis tickLine={false} axisLine={false} tick={{ fill: fill }}>
           <Label
-            value={"PE - CE COI VS Time"}
+            value={"PE - CE COI"}
             angle={-90}
             position={"insideLeft"}
+            style={{ textAnchor: "middle" }}
             fill={fill}
-            domain={["auto", "auto"]}
           />
         </YAxis>
         <CartesianGrid strokeDasharray="1 1" vertical={false} />
@@ -74,6 +83,19 @@ const CoiLineChart = ({ mode, symbol, strike }) => {
           label="Base"
           strokeDasharray="3 3"
         />
+
+        {checkedStrikes.map((strike, index) => (
+          <Line
+            key={index}
+            strokeWidth={2}
+            type="monotone"
+            dataKey="oidiff"
+            data={strikeData[strike] || []}
+            name={strike}
+            stroke={`hsl(${(index * 80) % 360}, 70%, 50%)`}
+            dot={false}
+          />
+        ))}
       </LineChart>
     </ResponsiveContainer>
   );

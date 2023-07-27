@@ -52,6 +52,7 @@ const CoiLineChart = ({ mode, symbol, type }) => {
       <LineChart data={data}>
         <XAxis
           dataKey="time"
+          type="category"
           tickLine={false}
           tick={{ fill: fill }}
           padding={{ left: 30 }}
@@ -59,10 +60,10 @@ const CoiLineChart = ({ mode, symbol, type }) => {
         <YAxis tickLine={false} axisLine={false} tick={{ fill: fill }}>
           <Label
             value={type === "pcr" ? "PCR vs Time" : "COI vs Time"}
+            style={{ textAnchor: "middle" }}
             angle={-90}
             position={"insideLeft"}
             fill={fill}
-            domain={["auto", "auto"]}
           />
         </YAxis>
         <CartesianGrid strokeDasharray="1 1" vertical={false} />

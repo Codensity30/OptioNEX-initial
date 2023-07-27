@@ -264,35 +264,37 @@ app.get("/live-oicoi-ex/:symbol/:expiryDate", async (req, res) => {
     })
     .catch(errorHandler);
 
-  const opDatas = response.data.resultData.opDatas;
-  const oiData = [];
-  const spot = opDatas[0].index_close;
+  if (response.status === 200) {
+    const opDatas = response.data.resultData.opDatas;
+    const oiData = [];
+    const spot = opDatas[0].index_close;
 
-  let strikeDiff = 1e9;
+    let strikeDiff = 1e9;
 
-  for (let i = 21; i < opDatas.length; i++) {
-    strikeDiff = Math.min(
-      strikeDiff,
-      Math.abs(opDatas[20].strike_price - opDatas[i].strike_price)
-    );
-  }
-
-  const atm = Math.ceil(spot / strikeDiff) * strikeDiff;
-  oiData.push({ atm: atm });
-
-  opDatas.forEach((element) => {
-    const sp = element.strike_price;
-    if (Math.abs(sp - atm) <= strikeDiff * 10) {
-      oiData.push({
-        strikePrice: sp,
-        callsOi: parseFloat((element.calls_oi / 100000).toFixed(2)),
-        callsCoi: parseFloat((element.calls_change_oi / 100000).toFixed(2)),
-        putsOi: parseFloat((element.puts_oi / 100000).toFixed(2)),
-        putsCoi: parseFloat((element.puts_change_oi / 100000).toFixed(2)),
-      });
+    for (let i = 21; i < opDatas.length; i++) {
+      strikeDiff = Math.min(
+        strikeDiff,
+        Math.abs(opDatas[20].strike_price - opDatas[i].strike_price)
+      );
     }
-  });
-  res.send(oiData);
+
+    const atm = Math.ceil(spot / strikeDiff) * strikeDiff;
+    oiData.push({ atm: atm });
+
+    opDatas.forEach((element) => {
+      const sp = element.strike_price;
+      if (Math.abs(sp - atm) <= strikeDiff * 10) {
+        oiData.push({
+          strikePrice: sp,
+          callsOi: parseFloat((element.calls_oi / 100000).toFixed(2)),
+          callsCoi: parseFloat((element.calls_change_oi / 100000).toFixed(2)),
+          putsOi: parseFloat((element.puts_oi / 100000).toFixed(2)),
+          putsCoi: parseFloat((element.puts_change_oi / 100000).toFixed(2)),
+        });
+      }
+    });
+    res.send(oiData);
+  }
 });
 
 app.get("/expiry-dates/:symbol", async (req, res) => {
@@ -321,9 +323,9 @@ app.get("/total-coi/:symbol", async (req, res) => {
       const spot = element.spot;
       const putLac = parseFloat((element.putsCoi / 100000).toFixed(2));
       const callLac = parseFloat((element.callsCoi / 100000).toFixed(2));
-      let pcr = Math.abs(parseFloat((putLac / callLac).toFixed(2)));
+      let pcr = parseFloat((putLac / callLac).toFixed(2));
       const oidiff = parseFloat((putLac - callLac).toFixed(2));
-      pcr = oidiff > 0 ? pcr : -1 * pcr;
+      pcr = oidiff > 0 ? Math.abs(pcr) : pcr;
       const eleLacs = {
         spot: spot,
         pcr: pcr,
@@ -338,7 +340,32 @@ app.get("/total-coi/:symbol", async (req, res) => {
   }
 });
 
-app.get("/strikes/:symbol", async (req, res) => {
+app.get("/sp-data/:symbol/:strike", async (req, res) => {
+  const symbol = req.params.symbol;
+  const strike = parseInt(req.params.strike);
+
+  const Sp = mongoose.model(symbol, oiDataSchema, symbol);
+
+  const data = await Sp.findOne({ strikePrice: strike }).catch(errorHandler);
+
+  if (data !== null) {
+    const oi = data.oiArray;
+    const oiLacs = oi.map((element) => {
+      const time = element.time;
+      const putLac = parseFloat((element.putsCoi / 100000).toFixed(2));
+      const callLac = parseFloat((element.callsCoi / 100000).toFixed(2));
+      const oidiff = parseFloat((putLac - callLac).toFixed(2));
+      const eleLacs = {
+        oidiff: oidiff,
+        time: time,
+      };
+      return eleLacs;
+    });
+    res.send(oiLacs);
+  }
+});
+
+app.get("/strikes-list/:symbol", async (req, res) => {
   const symbol = req.params.symbol;
   const url = "https://webapi.niftytrader.in/webapi/option/fatch-option-chain";
 
@@ -348,27 +375,29 @@ app.get("/strikes/:symbol", async (req, res) => {
     })
     .catch(errorHandler);
 
-  const opDatas = response.data.resultData.opDatas;
-  const spot = opDatas[0].index_close;
-  const strikes = [];
+  if (response.status === 200) {
+    const opDatas = response.data.resultData.opDatas;
+    const spot = opDatas[0].index_close;
+    const strikes = [];
 
-  let strikeDiff = 1e9;
+    let strikeDiff = 1e9;
 
-  for (let i = 21; i < opDatas.length; i++) {
-    strikeDiff = Math.min(
-      strikeDiff,
-      Math.abs(opDatas[20].strike_price - opDatas[i].strike_price)
-    );
+    for (let i = 21; i < opDatas.length; i++) {
+      strikeDiff = Math.min(
+        strikeDiff,
+        Math.abs(opDatas[20].strike_price - opDatas[i].strike_price)
+      );
+    }
+
+    const atm = Math.ceil(spot / strikeDiff) * strikeDiff;
+    strikes.push(atm);
+    for (let i = 1; i <= 5; i++) {
+      strikes.push(atm - i * strikeDiff);
+      strikes.push(atm + i * strikeDiff);
+    }
+    strikes.sort();
+    res.send(strikes);
   }
-
-  const atm = Math.ceil(spot / strikeDiff) * strikeDiff;
-  strikes.push(atm);
-  for (let i = 1; i <= 5; i++) {
-    strikes.push(atm - i * strikeDiff);
-    strikes.push(atm + i * strikeDiff);
-  }
-  strikes.sort();
-  res.send(strikes);
 });
 
 //* listening on port
