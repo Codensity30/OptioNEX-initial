@@ -17,7 +17,6 @@ const CoiLineChart = ({ mode, symbol, checkedStrikes }) => {
   const [strikeData, setStrikeData] = useState({});
 
   useEffect(() => {
-    // Define a function to fetch data for a specific strike
     const fetchDataForStrike = async (strike) => {
       try {
         const response = await axios.get(
@@ -29,7 +28,6 @@ const CoiLineChart = ({ mode, symbol, checkedStrikes }) => {
       }
     };
 
-    // Fetch data for all checked strikes
     checkedStrikes.forEach((strike) => fetchDataForStrike(strike));
 
     const intervalId = setInterval(() => {
@@ -94,6 +92,7 @@ const CoiLineChart = ({ mode, symbol, checkedStrikes }) => {
             name={strike}
             stroke={`hsl(${(index * 80) % 360}, 70%, 50%)`}
             dot={false}
+            unit=" L"
           />
         ))}
       </LineChart>

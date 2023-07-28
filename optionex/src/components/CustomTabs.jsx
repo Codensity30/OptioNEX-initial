@@ -28,39 +28,40 @@ const CustomTabs = ({ mode, symbol, expiryDate }) => {
       : true;
 
   return (
-    <div style={{ width: "full", display: "flex", justifyContent: "center" }}>
-      <Paper elevation={3} sx={{ width: "90%" }}>
-        <Tabs value={selectedTab} onChange={handleTabChange} centered>
-          <Tab
-            label="Open Interest"
-            icon={<InsertChartOutlinedRounded />}
-            iconPosition="start"
+    <Paper
+      elevation={3}
+      sx={{ width: "90%", margin: "auto", marginY: "30px", height: "95%" }}
+    >
+      <Tabs value={selectedTab} onChange={handleTabChange} centered>
+        <Tab
+          label="Open Interest"
+          icon={<InsertChartOutlinedRounded />}
+          iconPosition="start"
+        />
+        <Tab
+          disabled={disabled}
+          label="Buildup vs Time"
+          icon={<QueryStatsRounded />}
+          iconPosition="start"
+        />
+        <Tab
+          label="Multistrike COI"
+          icon={<StackedLineChartRounded />}
+          iconPosition="start"
+        />
+      </Tabs>
+      <Box sx={{ p: 3, height: "90%" }}>
+        {selectedTab === 0 && (
+          <OpenInterestTabs
+            symbol={symbol}
+            mode={mode}
+            expiryDate={expiryDate}
           />
-          <Tab
-            disabled={disabled}
-            label="Buildup vs Time"
-            icon={<QueryStatsRounded />}
-            iconPosition="start"
-          />
-          <Tab
-            label="Multistrike COI"
-            icon={<StackedLineChartRounded />}
-            iconPosition="start"
-          />
-        </Tabs>
-        <Box sx={{ p: 3 }}>
-          {selectedTab === 0 && (
-            <OpenInterestTabs
-              symbol={symbol}
-              mode={mode}
-              expiryDate={expiryDate}
-            />
-          )}
-          {selectedTab === 1 && <DataVsTimeTabs symbol={symbol} mode={mode} />}
-          {selectedTab === 2 && <MultiStrikeTabs symbol={symbol} mode={mode} />}
-        </Box>
-      </Paper>
-    </div>
+        )}
+        {selectedTab === 1 && <DataVsTimeTabs symbol={symbol} mode={mode} />}
+        {selectedTab === 2 && <MultiStrikeTabs symbol={symbol} mode={mode} />}
+      </Box>
+    </Paper>
   );
 };
 

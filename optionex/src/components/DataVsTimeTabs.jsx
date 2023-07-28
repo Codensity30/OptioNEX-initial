@@ -18,7 +18,7 @@ const CustomTabs = ({ mode, symbol }) => {
   };
 
   return (
-    <div style={{ height: "100vh" }}>
+    <>
       <Tabs
         value={selectedTab}
         onChange={handleTabChange}
@@ -58,7 +58,7 @@ const CustomTabs = ({ mode, symbol }) => {
           <CoiLineChart symbol={symbol} type="pcr" mode={mode} />
         )}
       </Box>
-    </div>
+    </>
   );
 };
 

@@ -37,6 +37,16 @@ function MultiStrikeTabs({ symbol, mode }) {
     };
   }, [symbol]);
 
+  useEffect(() => {
+    if (strikes && strikes.length >= 8) {
+      const s1 = strikes[3];
+      const s2 = strikes[5];
+      const s3 = strikes[7];
+      setCheckedStrikes([s1, s2, s3]);
+      console.log(checkedStrikes);
+    }
+  }, [strikes]);
+
   if (!isDataFetched) {
     return "Loading...";
   }

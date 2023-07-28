@@ -55,9 +55,15 @@ const CoiLineChart = ({ mode, symbol, type }) => {
           type="category"
           tickLine={false}
           tick={{ fill: fill }}
-          padding={{ left: 30 }}
+          padding={{ left: 30, right: 30 }}
         />
-        <YAxis tickLine={false} axisLine={false} tick={{ fill: fill }}>
+        <YAxis
+          yAxisId="left"
+          domain={["auto", "auto"]}
+          tickLine={false}
+          axisLine={false}
+          tick={{ fill: fill }}
+        >
           <Label
             value={type === "pcr" ? "PCR vs Time" : "COI vs Time"}
             style={{ textAnchor: "middle" }}
@@ -70,46 +76,74 @@ const CoiLineChart = ({ mode, symbol, type }) => {
         <Tooltip contentStyle={TooltipStyle} />
 
         <Legend iconType="triangle" />
+
         {type === "pcr" ? (
-          <Line
-            name="PCR"
-            dot={false}
-            type="monotone"
-            dataKey="pcr"
-            stroke="#4FC0D0"
-            strokeWidth={2}
-          />
+          <>
+            <YAxis
+              yAxisId="right"
+              orientation="right"
+              domain={["auto", "auto"]}
+              tickLine={false}
+              axisLine={false}
+              tick={{ fill: fill }}
+            />
+            <Line
+              yAxisId="right"
+              name="Spot"
+              dot={false}
+              type="monotone"
+              dataKey="spot"
+              stroke={mode === "light" ? "#9288F8" : "#D7BBF5"}
+              strokeWidth={2}
+            />
+            <Line
+              yAxisId="left"
+              name="PCR"
+              dot={false}
+              type="monotone"
+              dataKey="pcr"
+              stroke="#4FC0D0"
+              strokeWidth={2}
+            />
+          </>
         ) : (
           <>
             <ReferenceLine
+              yAxisId="left"
               y={0}
               stroke="purple"
               label="Base"
               strokeDasharray="3 3"
             />
             <Line
+              yAxisId="left"
               name="Puts COI"
               dot={false}
               type="monotone"
               dataKey="putsCoi"
               stroke="#03C988"
               strokeWidth={2}
+              unit=" L"
             />
             <Line
+              yAxisId="left"
               name="Calls COI"
               dot={false}
               type="monotone"
               dataKey="callsCoi"
               stroke="#FF8787"
               strokeWidth={2}
+              unit=" L"
             />
             <Line
+              yAxisId="left"
               name="Difference"
               dot={false}
               type="monotone"
               dataKey="oidiff"
               stroke="#F3AA60"
               strokeWidth={2}
+              unit=" L"
             />
           </>
         )}

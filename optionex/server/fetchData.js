@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 const axios = require("axios");
 const schedule = require("node-schedule");
 const cors = require("cors");
+const { PieChartRounded } = require("@mui/icons-material");
 
 //* function to handle error
 function errorHandler(error) {
@@ -225,30 +226,7 @@ app.get("/symbol-store", async (req, res) => {
       symbolName: element.symbol_name,
       lotSize: element.lot_size,
     });
-    // const doc = await Symbol.findOne({ symbolName: element.symbol_name }).catch(
-    //   errorHandler
-    // );
-    // if (!doc) {
-    //   await Symbol.create({
-    //     symbolName: element.symbol_name,
-    //     lotSize: element.lot_size,
-    //   });
-    // } else {
-    //   await Symbol.updateOne(
-    //     { symbolName: element.symbol_name },
-    //     {
-    //       lotSize: element.lot_size,
-    //     }
-    //   );
-    // }
   });
-
-  // const symObj = await Symbol.find({}).catch(errorHandler);
-  // const symList = [];
-  // symObj.forEach((element) => {
-  //   symList.push(element.symbolName);
-  // });
-
   res.send("Symbols stored");
 });
 
@@ -306,8 +284,10 @@ app.get("/expiry-dates/:symbol", async (req, res) => {
     })
     .catch(errorHandler);
 
-  const expDates = response.data.resultData.opExpiryDates;
-  res.send(expDates);
+  if (response.status === 200) {
+    const expDates = response.data.resultData.opExpiryDates;
+    res.send(expDates);
+  }
 });
 
 app.get("/total-coi/:symbol", async (req, res) => {
@@ -316,7 +296,7 @@ app.get("/total-coi/:symbol", async (req, res) => {
   const Total = mongoose.model(symbol, oiDataSchema, symbol);
 
   const data = await Total.findOne({ strikePrice: 0 }).catch(errorHandler);
-  if (data !== null) {
+  if (data !== undefined) {
     const oi = data.oiArray;
     const oiLacs = oi.map((element) => {
       const time = element.time;
@@ -324,8 +304,8 @@ app.get("/total-coi/:symbol", async (req, res) => {
       const putLac = parseFloat((element.putsCoi / 100000).toFixed(2));
       const callLac = parseFloat((element.callsCoi / 100000).toFixed(2));
       let pcr = parseFloat((putLac / callLac).toFixed(2));
-      const oidiff = parseFloat((putLac - callLac).toFixed(2));
-      pcr = oidiff > 0 ? Math.abs(pcr) : pcr;
+      const oidiff = Math.abs(parseFloat((putLac - callLac).toFixed(2)));
+      pcr = oidiff > 0 ? pcr : -pcr;
       const eleLacs = {
         spot: spot,
         pcr: pcr,
@@ -348,7 +328,7 @@ app.get("/sp-data/:symbol/:strike", async (req, res) => {
 
   const data = await Sp.findOne({ strikePrice: strike }).catch(errorHandler);
 
-  if (data !== null) {
+  if (data !== undefined && data !== null) {
     const oi = data.oiArray;
     const oiLacs = oi.map((element) => {
       const time = element.time;

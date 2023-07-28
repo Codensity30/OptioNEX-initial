@@ -33,9 +33,7 @@ export default function InputBox({ handleChange }) {
       options={symbols}
       sx={{ width: 300 }}
       onChange={handleChange}
-      renderInput={(params) => (
-        <TextField {...params} label="Symbols" defaultValue={"NIFTY"} />
-      )}
+      renderInput={(params) => <TextField {...params} label="Symbols" />}
     />
   );
 }

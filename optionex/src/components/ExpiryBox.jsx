@@ -39,17 +39,11 @@ export default function ExpiryBox({ handleChange, symbol }) {
   return (
     <Autocomplete
       disablePortal
-      defaultValue={expiryDates[0]}
+      value={expiryDates[0]}
       options={expiryDates}
       sx={{ width: 300 }}
       onChange={handleChange}
-      renderInput={(params) => (
-        <TextField
-          {...params}
-          label="Expiry Date"
-          defaultValue={expiryDates[0]}
-        />
-      )}
+      renderInput={(params) => <TextField {...params} label="Expiry Date" />}
     />
   );
 }

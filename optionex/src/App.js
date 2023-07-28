@@ -2,11 +2,7 @@ import React, { useState } from "react";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import CustomTabs from "./components/CustomTabs";
-import InputBox from "./components/InputBox";
-import ExpiryBox from "./components/ExpiryBox";
-import IconButton from "@mui/material/IconButton";
-import LightModeIconRounded from "@mui/icons-material/LightModeRounded";
-import DarkModeIconRounded from "@mui/icons-material/DarkModeRounded";
+import InputBar from "./components/InputBar";
 
 function App() {
   const [symbol, setSymbol] = useState("NIFTY");
@@ -32,6 +28,9 @@ function App() {
   const Theme = createTheme({
     palette: {
       mode: mode,
+      background: {
+        default: mode === "light" ? "#efefef" : "#444444",
+      },
     },
   });
 
@@ -39,18 +38,14 @@ function App() {
     <ThemeProvider theme={Theme}>
       <CssBaseline />
       <main>
-        <div className="flex justify-center mt-10 gap-5">
-          <InputBox handleChange={handleSymbolChange} />
-          <ExpiryBox handleChange={handleExpiryChange} symbol={symbol} />
-          <IconButton aria-label="mode" onClick={handleModeChange}>
-            {mode === "light" ? (
-              <DarkModeIconRounded />
-            ) : (
-              <LightModeIconRounded />
-            )}
-          </IconButton>
-        </div>
-        <div className="my-10">
+        <div style={{ width: "100%", height: "100vh" }}>
+          <InputBar
+            symbol={symbol}
+            mode={mode}
+            handleExpiryChange={handleExpiryChange}
+            handleSymbolChange={handleSymbolChange}
+            handleModeChange={handleModeChange}
+          />
           <CustomTabs mode={mode} symbol={symbol} expiryDate={expiryDate} />
         </div>
       </main>
