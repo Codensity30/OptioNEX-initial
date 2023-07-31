@@ -6,7 +6,7 @@ import CoiLineChart from "./CoiLineChart";
 import DataTable from "./DataTable";
 import {
   InsightsRounded,
-  TableChartRounded,
+  TableChartOutlined,
   TimelineRounded,
 } from "@mui/icons-material";
 
@@ -16,6 +16,37 @@ const CustomTabs = ({ mode, symbol }) => {
   const handleTabChange = (event, newValue) => {
     setSelectedTab(newValue); // Update the selected tab index when a new tab is selected
   };
+
+  const disabled =
+    symbol === "NIFTY" ||
+    symbol === "BANKNIFTY" ||
+    symbol === "FINNIFTY" ||
+    symbol === "MIDCPNIFTY"
+      ? false
+      : true;
+
+  if (disabled) {
+    return (
+      <>
+        <div style={{ height: "80%" }}>
+          <img
+            src={require("../images/unavailable.png")}
+            alt=""
+            style={{
+              height: "100%",
+              width: "100%",
+              margin: "auto",
+              objectFit: "contain",
+            }}
+          />
+        </div>
+        <div style={{ textAlign: "center" }}>
+          Currently this feature is available only for indices. Try searching
+          for NIFTY, BANKNIFTY, FINIFTY
+        </div>
+      </>
+    );
+  }
 
   return (
     <>
@@ -28,7 +59,7 @@ const CustomTabs = ({ mode, symbol }) => {
       >
         <Tab
           label="Buildup"
-          icon={<TableChartRounded />}
+          icon={<TableChartOutlined />}
           iconPosition="start"
         />
         <Tab

@@ -22,6 +22,8 @@ const bg = {
   call: { light: "#FFD1DA", dark: "#800000" },
   put: { light: "#E8FFCE", dark: "#448000" },
   neutral: { light: "#FFFAD7", dark: "#807000" },
+  callText: { light: "#ef5350", dark: "#d32f2f" },
+  putText: { light: "#2e7d32", dark: "#4caf50" },
 };
 
 export default function BasicTable({ mode, symbol }) {
@@ -51,46 +53,25 @@ export default function BasicTable({ mode, symbol }) {
       <Table sx={{ minWidth: 650 }} stickyHeader aria-label="sticky table">
         <TableHead>
           <TableRow>
-            <TableCell
-              align="center"
-              sx={{ background: bg.default[mode], fontWeight: "bold" }}
-            >
+            <TableCell align="center" sx={{ background: bg.default[mode] }}>
               Time
             </TableCell>
-            <TableCell
-              align="center"
-              sx={{ background: bg.call[mode], fontWeight: "bold" }}
-            >
+            <TableCell align="center" sx={{ background: bg.call[mode] }}>
               Call COI&nbsp;(L)
             </TableCell>
-            <TableCell
-              align="center"
-              sx={{ background: bg.put[mode], fontWeight: "bold" }}
-            >
+            <TableCell align="center" sx={{ background: bg.put[mode] }}>
               Put COI&nbsp;(L)
             </TableCell>
-            <TableCell
-              align="center"
-              sx={{ background: bg.default[mode], fontWeight: "bold" }}
-            >
+            <TableCell align="center" sx={{ background: bg.default[mode] }}>
               Difference&nbsp;(L)
             </TableCell>
-            <TableCell
-              align="center"
-              sx={{ background: bg.default[mode], fontWeight: "bold" }}
-            >
+            <TableCell align="center" sx={{ background: bg.default[mode] }}>
               PCR
             </TableCell>
-            <TableCell
-              align="center"
-              sx={{ background: bg.default[mode], fontWeight: "bold" }}
-            >
+            <TableCell align="center" sx={{ background: bg.default[mode] }}>
               SPOT
             </TableCell>
-            <TableCell
-              align="center"
-              sx={{ background: bg.default[mode], fontWeight: "bold" }}
-            >
+            <TableCell align="center" sx={{ background: bg.default[mode] }}>
               Signal
             </TableCell>
           </TableRow>
@@ -102,10 +83,10 @@ export default function BasicTable({ mode, symbol }) {
               sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
             >
               <TableCell align="center">{row.time}</TableCell>
-              <TableCell align="center" sx={{ color: "#EF6262" }}>
+              <TableCell align="center" sx={{ color: bg.callText[mode] }}>
                 {row.callsCoi}
               </TableCell>
-              <TableCell align="center" sx={{ color: "#03C988" }}>
+              <TableCell align="center" sx={{ color: bg.putText[mode] }}>
                 {row.putsCoi}
               </TableCell>
               <TableCell align="center">

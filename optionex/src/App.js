@@ -29,7 +29,7 @@ function App() {
     palette: {
       mode: mode,
       background: {
-        default: mode === "light" ? "#efefef" : "#444444",
+        default: mode === "light" ? "#efefef" : "#565656",
       },
     },
   });

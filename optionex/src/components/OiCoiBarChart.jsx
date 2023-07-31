@@ -61,6 +61,7 @@ const OiCoiBarChart = ({ mode, symbol, expiryDate, oicoi }) => {
         <YAxis
           tickLine={false}
           axisLine={false}
+          domain={["auto", "auto"]}
           type="number"
           tick={{ fill: fill }}
         >
@@ -77,19 +78,19 @@ const OiCoiBarChart = ({ mode, symbol, expiryDate, oicoi }) => {
         <Legend iconType="triangle" />
         <ReferenceLine x={data[0].atm} stroke={fill} strokeDasharray="2 3" />
         <Bar
-          name={`PUTS ${oicoi}`}
+          name={`Put ${oicoi}`}
           dot={false}
           type="monotone"
           dataKey={oicoi === "OI" ? "putsOi" : "putsCoi"}
-          fill="#03C988"
+          fill="#63d168"
           unit={" L"}
         />
         <Bar
-          name={`CALLS ${oicoi}`}
+          name={`Call ${oicoi}`}
           dot={false}
           type="monotone"
           dataKey={oicoi === "OI" ? "callsOi" : "callsCoi"}
-          fill="#FF8787"
+          fill="#e96767"
           unit={" L"}
         />
       </BarChart>

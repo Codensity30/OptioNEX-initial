@@ -19,18 +19,15 @@ const CustomTabs = ({ mode, symbol, expiryDate }) => {
     setSelectedTab(newValue);
   };
 
-  const disabled =
-    symbol === "NIFTY" ||
-    symbol === "BANKNIFTY" ||
-    symbol === "FINNIFTY" ||
-    symbol === "MIDCPNIFTY"
-      ? false
-      : true;
-
   return (
     <Paper
       elevation={3}
-      sx={{ width: "90%", margin: "auto", marginY: "30px", height: "95%" }}
+      sx={{
+        width: "90%",
+        margin: "auto",
+        marginY: "30px",
+        height: "95%",
+      }}
     >
       <Tabs value={selectedTab} onChange={handleTabChange} centered>
         <Tab
@@ -39,7 +36,6 @@ const CustomTabs = ({ mode, symbol, expiryDate }) => {
           iconPosition="start"
         />
         <Tab
-          disabled={disabled}
           label="Buildup vs Time"
           icon={<QueryStatsRounded />}
           iconPosition="start"

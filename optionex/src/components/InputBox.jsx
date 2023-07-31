@@ -33,7 +33,16 @@ export default function InputBox({ handleChange }) {
       options={symbols}
       sx={{ width: 300 }}
       onChange={handleChange}
-      renderInput={(params) => <TextField {...params} label="Symbols" />}
+      renderInput={(params) => (
+        <TextField
+          {...params}
+          label="Symbols"
+          inputProps={{
+            ...params.inputProps,
+            value: (params.inputProps.value || "").toUpperCase(),
+          }}
+        />
+      )}
     />
   );
 }

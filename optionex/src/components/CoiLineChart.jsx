@@ -93,7 +93,7 @@ const CoiLineChart = ({ mode, symbol, type }) => {
               dot={false}
               type="monotone"
               dataKey="spot"
-              stroke={mode === "light" ? "#9288F8" : "#D7BBF5"}
+              stroke="#F1C93B"
               strokeWidth={2}
             />
             <Line
@@ -102,7 +102,7 @@ const CoiLineChart = ({ mode, symbol, type }) => {
               dot={false}
               type="monotone"
               dataKey="pcr"
-              stroke="#4FC0D0"
+              stroke="#33a3e3"
               strokeWidth={2}
             />
           </>
@@ -121,7 +121,7 @@ const CoiLineChart = ({ mode, symbol, type }) => {
               dot={false}
               type="monotone"
               dataKey="putsCoi"
-              stroke="#03C988"
+              stroke="#63d168"
               strokeWidth={2}
               unit=" L"
             />
@@ -131,7 +131,7 @@ const CoiLineChart = ({ mode, symbol, type }) => {
               dot={false}
               type="monotone"
               dataKey="callsCoi"
-              stroke="#FF8787"
+              stroke="#e96767"
               strokeWidth={2}
               unit=" L"
             />
@@ -141,7 +141,7 @@ const CoiLineChart = ({ mode, symbol, type }) => {
               dot={false}
               type="monotone"
               dataKey="oidiff"
-              stroke="#F3AA60"
+              stroke="#33a3e3"
               strokeWidth={2}
               unit=" L"
             />

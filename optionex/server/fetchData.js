@@ -4,7 +4,6 @@ const mongoose = require("mongoose");
 const axios = require("axios");
 const schedule = require("node-schedule");
 const cors = require("cors");
-const { PieChartRounded } = require("@mui/icons-material");
 
 //* function to handle error
 function errorHandler(error) {
@@ -72,76 +71,85 @@ function getCurrentISTTime() {
 async function getAndStore(symbol) {
   const url = "https://webapi.niftytrader.in/webapi/option/fatch-option-chain";
 
-  const response = await axios
-    .get(url, {
+  try {
+    const response = await axios.get(url, {
       params: { symbol: symbol },
-    })
-    .catch(errorHandler);
-
-  if (response.data.length !== 0) {
-    //* creating mongoose model with collection name same as symbol
-    const Symbol = mongoose.model(symbol, oiDataSchema, symbol);
-
-    //* parsing response from api to get the option data
-    const opDatas = response.data.resultData.opDatas;
-
-    //* important vaiables required
-    const spot = opDatas[0].index_close;
-
-    opDatas.sort((a, b) => {
-      return a.strike_price < b.strike_price;
     });
 
-    const atmIndex = opDatas.findIndex((obj) => obj.strike_price > spot);
-    let total_puts_change_oi = 0;
-    let total_calls_change_oi = 0;
+    if (response.data.length !== 0) {
+      //* creating mongoose model with collection name same as symbol
+      const Symbol = mongoose.model(symbol, oiDataSchema, symbol);
 
-    //* entry of all sp lying in range of 1000 points up and down
-    const start = Math.max(0, atmIndex - 20);
-    const end = Math.min(opDatas.length - 1, atmIndex + 20);
-    for (let i = start; i <= end; i++) {
-      const element = opDatas[i];
-      const sp = element.strike_price;
+      //* parsing response from api to get the option data
+      const opDatas = response.data.resultData.opDatas;
 
-      //* suming up coi of 10 strikes up-down
-      if (Math.abs(i - atmIndex) <= 10) {
-        total_puts_change_oi += element.puts_change_oi;
-        total_calls_change_oi += element.calls_change_oi;
+      //* important variables required
+      const spot = opDatas[0].index_close;
+
+      opDatas.sort((a, b) => {
+        return a.strike_price < b.strike_price;
+      });
+
+      const atmIndex = opDatas.findIndex((obj) => obj.strike_price > spot);
+      let total_puts_change_oi = 0;
+      let total_calls_change_oi = 0;
+
+      //* entry of all sp lying in range of 1000 points up and down
+      const start = Math.max(0, atmIndex - 20);
+      const end = Math.min(opDatas.length - 1, atmIndex + 20);
+      for (let i = start; i <= end; i++) {
+        const element = opDatas[i];
+        const sp = element.strike_price;
+
+        //* summing up coi of 10 strikes up-down
+        if (Math.abs(i - atmIndex) <= 10) {
+          total_puts_change_oi += element.puts_change_oi;
+          total_calls_change_oi += element.calls_change_oi;
+        }
+
+        //* storing coi of 20 strikes up-down in db
+        const doc = await Symbol.findOne({ strikePrice: sp }).catch(
+          errorHandler
+        );
+
+        const oiArray = {
+          spot: spot,
+          time: getCurrentISTTime(),
+          putsCoi: element.puts_change_oi,
+          callsCoi: element.calls_change_oi,
+        };
+
+        if (!doc) {
+          await Symbol.create({ strikePrice: sp, oiArray }).catch(errorHandler);
+        } else {
+          await Symbol.updateOne(
+            { strikePrice: sp },
+            { $push: { oiArray } }
+          ).catch(errorHandler);
+        }
       }
-      //* storing coi of 20 strikes up-down in db
-      const doc = await Symbol.findOne({ strikePrice: sp }).catch(errorHandler);
+
+      //* special entry to keep track of the total put and call oi
+      const doc = await Symbol.findOne({ strikePrice: 0 }).catch(errorHandler);
+
       const oiArray = {
         spot: spot,
         time: getCurrentISTTime(),
-        putsCoi: element.puts_change_oi,
-        callsCoi: element.calls_change_oi,
+        putsCoi: total_puts_change_oi,
+        callsCoi: total_calls_change_oi,
       };
 
       if (!doc) {
-        await Symbol.create({ strikePrice: sp, oiArray }).catch(errorHandler);
+        await Symbol.create({ strikePrice: 0, oiArray }).catch(errorHandler);
       } else {
         await Symbol.updateOne(
-          { strikePrice: sp },
+          { strikePrice: 0 },
           { $push: { oiArray } }
         ).catch(errorHandler);
       }
     }
-
-    //* special entry to keep track of the total put and call oi
-    const doc = await Symbol.findOne({ strikePrice: 0 }).catch(errorHandler);
-    const oiArray = {
-      spot: spot,
-      time: getCurrentISTTime(),
-      putsCoi: total_puts_change_oi,
-      callsCoi: total_calls_change_oi,
-    };
-    if (!doc) {
-      await Symbol.create({ strikePrice: 0, oiArray }).catch(errorHandler);
-    } else {
-      await Symbol.updateOne({ strikePrice: 0 }, { $push: { oiArray } }).catch(
-        errorHandler
-      );
-    }
+  } catch (error) {
+    console.error("An error occurred:", error.message);
   }
 }
 
@@ -161,7 +169,7 @@ async function storeSymbol() {
 
 process.env.TZ = "Asia/Kolkata";
 const dailyDbClearCron = "14 9 * * 1-5";
-
+const dailySymbolUpCron = "10 14 9 * * 1-5";
 const firstHourCron = "15-59/5 9 * * 1-5";
 const daily5minCron = "*/5 10-14 * * 1-5";
 const lastHourCron = "0-30/5 15 * * 1-5";
@@ -181,7 +189,10 @@ const lastHour = schedule.scheduleJob(lastHourCron, () => {
 const dailyDbClear = schedule.scheduleJob(dailyDbClearCron, () => {
   clearDb();
   console.log("db is cleared");
+});
+const dailySymbolUp = schedule.scheduleJob(dailySymbolUpCron, () => {
   storeSymbol();
+  console.log("symbols updated");
 });
 
 //! ROUTING -------------------------------------------------------
@@ -200,14 +211,19 @@ app.get("/update-oiData", async (req, res) => {
 });
 
 app.get("/symbol-list", async (req, res) => {
-  const Symbol = mongoose.model("symbol_list", symbolListSchema);
-  const symObj = await Symbol.find({}).catch(errorHandler);
-  const symList = [];
-  symObj.forEach((element) => {
-    symList.push(element.symbolName);
-  });
+  try {
+    const Symbol = mongoose.model("symbol_list", symbolListSchema);
 
-  res.send(symList);
+    const symObj = await Symbol.find({}).catch(errorHandler);
+
+    // Map the data to get an array of symbol names
+    const symList = symObj.map((element) => element.symbolName);
+
+    res.send(symList);
+  } catch (error) {
+    errorHandler(error);
+    res.status(500).send("Internal Server Error");
+  }
 });
 
 //* endpoint to record symbols lists in database
@@ -296,14 +312,14 @@ app.get("/total-coi/:symbol", async (req, res) => {
   const Total = mongoose.model(symbol, oiDataSchema, symbol);
 
   const data = await Total.findOne({ strikePrice: 0 }).catch(errorHandler);
-  if (data !== undefined) {
+  if (data !== undefined && data !== null) {
     const oi = data.oiArray;
     const oiLacs = oi.map((element) => {
       const time = element.time;
       const spot = element.spot;
       const putLac = parseFloat((element.putsCoi / 100000).toFixed(2));
       const callLac = parseFloat((element.callsCoi / 100000).toFixed(2));
-      let pcr = parseFloat((putLac / callLac).toFixed(2));
+      let pcr = Math.abs(parseFloat((putLac / callLac).toFixed(2)));
       const oidiff = Math.abs(parseFloat((putLac - callLac).toFixed(2)));
       pcr = oidiff > 0 ? pcr : -pcr;
       const eleLacs = {

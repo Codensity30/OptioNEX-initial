@@ -31,10 +31,6 @@ function MultiStrikeTabs({ symbol, mode }) {
       }
     };
     fetchData();
-    const intervalId = setInterval(fetchData, 60000);
-    return () => {
-      clearInterval(intervalId);
-    };
   }, [symbol]);
 
   useEffect(() => {
@@ -46,6 +42,23 @@ function MultiStrikeTabs({ symbol, mode }) {
       console.log(checkedStrikes);
     }
   }, [strikes]);
+
+  const disabled =
+    symbol === "NIFTY" ||
+    symbol === "BANKNIFTY" ||
+    symbol === "FINNIFTY" ||
+    symbol === "MIDCPNIFTY"
+      ? false
+      : true;
+
+  if (disabled) {
+    return (
+      <div style={{ textAlign: "center" }}>
+        Currently this feature is available only for indices. Try searching for
+        NIFTY, BANKNIFTY, FINIFTY
+      </div>
+    );
+  }
 
   if (!isDataFetched) {
     return "Loading...";

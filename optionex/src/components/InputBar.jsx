@@ -3,8 +3,7 @@ import InputBox from "./InputBox";
 import ExpiryBox from "./ExpiryBox";
 import IconButton from "@mui/material/IconButton";
 import Paper from "@mui/material/Paper";
-import LightModeIconRounded from "@mui/icons-material/LightModeRounded";
-import DarkModeIconRounded from "@mui/icons-material/DarkModeRounded";
+import { DarkModeOutlined, LightModeOutlined } from "@mui/icons-material";
 
 function InputBar({
   symbol,
@@ -31,7 +30,7 @@ function InputBar({
       <InputBox handleChange={handleSymbolChange} />
       <ExpiryBox handleChange={handleExpiryChange} symbol={symbol} />
       <IconButton aria-label="mode" onClick={handleModeChange}>
-        {mode === "light" ? <DarkModeIconRounded /> : <LightModeIconRounded />}
+        {mode === "light" ? <DarkModeOutlined /> : <LightModeOutlined />}
       </IconButton>
     </Paper>
   );
