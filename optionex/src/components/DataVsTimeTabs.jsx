@@ -30,7 +30,7 @@ const CustomTabs = ({ mode, symbol }) => {
       <>
         <div style={{ height: "80%" }}>
           <img
-            src={require("../images/unavailable.png")}
+            src={require(`../images/unavailable_${mode}.png`)}
             alt=""
             style={{
               height: "100%",
@@ -40,9 +40,24 @@ const CustomTabs = ({ mode, symbol }) => {
             }}
           />
         </div>
-        <div style={{ textAlign: "center" }}>
-          Currently this feature is available only for indices. Try searching
-          for NIFTY, BANKNIFTY, FINIFTY
+        <div
+          style={{
+            textAlign: "center",
+            fontFamily: "Comic Sans MS, 'Arial Rounded MT Bold', sans-serif",
+            color: "grey",
+          }}
+        >
+          Oops! It looks like the feature you're trying to use is currently
+          available only for indices.
+        </div>
+        <div
+          style={{
+            textAlign: "center",
+            fontFamily: "Comic Sans MS, 'Arial Rounded MT Bold', sans-serif",
+            color: "grey",
+          }}
+        >
+          Try searching for NIFTY, BANKNIFTY, FINIFTY
         </div>
       </>
     );
@@ -63,12 +78,12 @@ const CustomTabs = ({ mode, symbol }) => {
           iconPosition="start"
         />
         <Tab
-          label="COI vs Time"
+          label="Put vs Call"
           icon={<InsightsRounded />}
           iconPosition="start"
         />
         <Tab
-          label="PCR vs Time"
+          label="PCR vs Spot"
           icon={<TimelineRounded />}
           iconPosition="start"
         />

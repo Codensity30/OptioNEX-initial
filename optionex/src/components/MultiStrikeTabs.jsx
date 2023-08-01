@@ -53,10 +53,39 @@ function MultiStrikeTabs({ symbol, mode }) {
 
   if (disabled) {
     return (
-      <div style={{ textAlign: "center" }}>
-        Currently this feature is available only for indices. Try searching for
-        NIFTY, BANKNIFTY, FINIFTY
-      </div>
+      <>
+        <div style={{ height: "80%" }}>
+          <img
+            src={require(`../images/unavailable_${mode}.png`)}
+            alt=""
+            style={{
+              height: "100%",
+              width: "100%",
+              margin: "auto",
+              objectFit: "contain",
+            }}
+          />
+        </div>
+        <div
+          style={{
+            textAlign: "center",
+            fontFamily: "Comic Sans MS, 'Arial Rounded MT Bold', sans-serif",
+            color: "grey",
+          }}
+        >
+          Oops! It looks like the feature you're trying to use is currently
+          available only for indices.
+        </div>
+        <div
+          style={{
+            textAlign: "center",
+            fontFamily: "Comic Sans MS, 'Arial Rounded MT Bold', sans-serif",
+            color: "grey",
+          }}
+        >
+          Try searching for NIFTY, BANKNIFTY, FINIFTY
+        </div>
+      </>
     );
   }
 

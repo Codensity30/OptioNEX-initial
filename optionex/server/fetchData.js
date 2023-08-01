@@ -320,7 +320,7 @@ app.get("/total-coi/:symbol", async (req, res) => {
       const putLac = parseFloat((element.putsCoi / 100000).toFixed(2));
       const callLac = parseFloat((element.callsCoi / 100000).toFixed(2));
       let pcr = Math.abs(parseFloat((putLac / callLac).toFixed(2)));
-      const oidiff = Math.abs(parseFloat((putLac - callLac).toFixed(2)));
+      const oidiff = parseFloat((putLac - callLac).toFixed(2));
       pcr = oidiff > 0 ? pcr : -pcr;
       const eleLacs = {
         spot: spot,

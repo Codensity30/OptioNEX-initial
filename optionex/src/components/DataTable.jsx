@@ -56,11 +56,11 @@ export default function BasicTable({ mode, symbol }) {
             <TableCell align="center" sx={{ background: bg.default[mode] }}>
               Time
             </TableCell>
-            <TableCell align="center" sx={{ background: bg.call[mode] }}>
-              Call COI&nbsp;(L)
-            </TableCell>
             <TableCell align="center" sx={{ background: bg.put[mode] }}>
               Put COI&nbsp;(L)
+            </TableCell>
+            <TableCell align="center" sx={{ background: bg.call[mode] }}>
+              Call COI&nbsp;(L)
             </TableCell>
             <TableCell align="center" sx={{ background: bg.default[mode] }}>
               Difference&nbsp;(L)
@@ -83,11 +83,11 @@ export default function BasicTable({ mode, symbol }) {
               sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
             >
               <TableCell align="center">{row.time}</TableCell>
-              <TableCell align="center" sx={{ color: bg.callText[mode] }}>
-                {row.callsCoi}
-              </TableCell>
               <TableCell align="center" sx={{ color: bg.putText[mode] }}>
                 {row.putsCoi}
+              </TableCell>
+              <TableCell align="center" sx={{ color: bg.callText[mode] }}>
+                {row.callsCoi}
               </TableCell>
               <TableCell align="center">
                 {row.oidiff > 0 ? (
