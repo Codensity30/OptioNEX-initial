@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import Loader from "./Loader";
 import {
   BarChart,
   Bar,
@@ -51,11 +52,15 @@ const OiCoiBarChart = ({ mode, symbol, expiryDate, oicoi }) => {
   };
 
   if (!isDataFetched) {
-    return <div>Loading...</div>;
+    return (
+      <div style={{ display: "flex", alignItems: "center", height: "100%" }}>
+        <Loader />
+      </div>
+    );
   }
 
   return (
-    <ResponsiveContainer width="98%" height={500}>
+    <ResponsiveContainer width="98%" height="100%">
       <BarChart data={data} barCategoryGap={"20%"}>
         <XAxis dataKey="strikePrice" tickLine={false} tick={{ fill: fill }} />
         <YAxis

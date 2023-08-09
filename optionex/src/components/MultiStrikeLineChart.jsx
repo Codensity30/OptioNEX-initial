@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import Loader from "./Loader";
 import {
   LineChart,
   Line,
@@ -15,6 +16,7 @@ import {
 
 const CoiLineChart = ({ mode, symbol, checkedStrikes }) => {
   const [strikeData, setStrikeData] = useState({});
+  const [isDataFetched, setIsDataFetched] = useState(false);
 
   useEffect(() => {
     const fetchDataForStrike = async (strike) => {
@@ -23,6 +25,7 @@ const CoiLineChart = ({ mode, symbol, checkedStrikes }) => {
           `http://localhost:8000/sp-data/${symbol}/${strike}`
         );
         setStrikeData((prevData) => ({ ...prevData, [strike]: response.data }));
+        setIsDataFetched(true);
       } catch (error) {
         console.error(`Error fetching data for ${strike}:`, error);
       }
@@ -52,8 +55,16 @@ const CoiLineChart = ({ mode, symbol, checkedStrikes }) => {
     border: "1px solid rgba(200, 200, 200, 0.4)",
   };
 
+  if (!isDataFetched) {
+    return (
+      <div style={{ display: "flex", alignItems: "center", height: "100%" }}>
+        <Loader />
+      </div>
+    );
+  }
+
   return (
-    <ResponsiveContainer width="98%" height={500}>
+    <ResponsiveContainer width="98%" height="100%">
       <LineChart data={Object.values(strikeData)}>
         <XAxis
           dataKey="time"

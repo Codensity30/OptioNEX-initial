@@ -1,0 +1,57 @@
+/*LOADER BOX*/
+.loader {
+  height: 150px;
+  width: 200px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #a0a0a0;
+  position: relative;
+}
+
+/*LOADER 11*/
+@keyframes loader11 {
+  0% {
+    y: 20;
+  }
+  10% {
+    y: 20;
+  }
+  20% {
+    y: 0;
+  }
+  45% {
+    y: -20;
+  }
+  65% {
+    y: -20;
+  }
+  80% {
+    y: 0;
+  }
+  100% {
+    y: 20;
+  }
+}
+
+.loader11 rect {
+  animation: 2s ease loader11 infinite;
+}
+.loader11 rect:first-of-type {
+  animation-delay: 0.3s;
+}
+.loader11 rect:nth-of-type(2) {
+  animation-delay: 0.25s;
+}
+.loader11 rect:nth-of-type(3) {
+  animation-delay: 0.2s;
+}
+.loader11 rect:nth-of-type(4) {
+  animation-delay: 0.15s;
+}
+.loader11 rect:nth-of-type(5) {
+  animation-delay: 0.1s;
+}
+.loader11 rect:nth-of-type(6) {
+  animation-delay: 0.05s;
+}

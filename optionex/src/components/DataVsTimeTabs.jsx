@@ -27,7 +27,7 @@ const CustomTabs = ({ mode, symbol }) => {
 
   if (disabled) {
     return (
-      <>
+      <div style={{ height: "95%", marginTop: "5%" }}>
         <div style={{ height: "80%" }}>
           <img
             src={require(`../images/unavailable_${mode}.png`)}
@@ -59,7 +59,7 @@ const CustomTabs = ({ mode, symbol }) => {
         >
           Try searching for NIFTY, BANKNIFTY, FINIFTY
         </div>
-      </>
+      </div>
     );
   }
 

@@ -37,18 +37,16 @@ function App() {
   return (
     <ThemeProvider theme={Theme}>
       <CssBaseline />
-      <main>
-        <div style={{ width: "100%", height: "100vh" }}>
-          <InputBar
-            symbol={symbol}
-            mode={mode}
-            handleExpiryChange={handleExpiryChange}
-            handleSymbolChange={handleSymbolChange}
-            handleModeChange={handleModeChange}
-          />
-          <CustomTabs mode={mode} symbol={symbol} expiryDate={expiryDate} />
-        </div>
-      </main>
+      <div style={{ width: "100%", height: "100%" }}>
+        <InputBar
+          symbol={symbol}
+          mode={mode}
+          handleExpiryChange={handleExpiryChange}
+          handleSymbolChange={handleSymbolChange}
+          handleModeChange={handleModeChange}
+        />
+        <CustomTabs mode={mode} symbol={symbol} expiryDate={expiryDate} />
+      </div>
     </ThemeProvider>
   );
 }

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import Loader from "./Loader";
 import {
   LineChart,
   Line,
@@ -15,6 +16,7 @@ import {
 
 const CoiLineChart = ({ mode, symbol, type }) => {
   const [data, setData] = useState([]);
+  const [isDataFetched, setIsDataFetched] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -23,6 +25,7 @@ const CoiLineChart = ({ mode, symbol, type }) => {
           `http://localhost:8000/total-coi/${symbol}`
         );
         setData(response.data);
+        setIsDataFetched(true);
       } catch (error) {
         console.error("Error fetching data: ", error);
       }
@@ -47,8 +50,16 @@ const CoiLineChart = ({ mode, symbol, type }) => {
     border: "1px solid rgba(200, 200, 200, 0.4)",
   };
 
+  if (!isDataFetched) {
+    return (
+      <div style={{ display: "flex", alignItems: "center", height: "500px" }}>
+        <Loader />
+      </div>
+    );
+  }
+
   return (
-    <ResponsiveContainer width="98%" height={500}>
+    <ResponsiveContainer width="98%" height="100%">
       <LineChart data={data}>
         <XAxis
           dataKey="time"

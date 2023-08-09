@@ -13,7 +13,7 @@ const CustomTabs = ({ mode, symbol, expiryDate }) => {
   };
 
   return (
-    <div>
+    <>
       <Tabs
         value={selectedTab}
         onChange={handleTabChange}
@@ -32,7 +32,9 @@ const CustomTabs = ({ mode, symbol, expiryDate }) => {
           iconPosition="start"
         />
       </Tabs>
-      <Box sx={{ display: "flex", justifyContent: "center", py: 5 }}>
+      <Box
+        sx={{ display: "flex", justifyContent: "center", py: 5, height: "95%" }}
+      >
         {selectedTab === 0 && (
           <OiCoiBarChart
             symbol={symbol}
@@ -50,7 +52,7 @@ const CustomTabs = ({ mode, symbol, expiryDate }) => {
           />
         )}
       </Box>
-    </div>
+    </>
   );
 };
 

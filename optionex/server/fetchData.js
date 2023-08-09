@@ -76,7 +76,7 @@ async function getAndStore(symbol) {
       params: { symbol: symbol },
     });
 
-    if (response.data.length !== 0) {
+    if (response) {
       //* creating mongoose model with collection name same as symbol
       const Symbol = mongoose.model(symbol, oiDataSchema, symbol);
 
@@ -168,8 +168,7 @@ async function storeSymbol() {
 //* sheduling jobs to run at certain interval and time
 
 process.env.TZ = "Asia/Kolkata";
-const dailyDbClearCron = "14 9 * * 1-5";
-const dailySymbolUpCron = "10 14 9 * * 1-5";
+const dailyDbClearCron = "10 14 9 * * 1-5";
 const firstHourCron = "15-59/5 9 * * 1-5";
 const daily5minCron = "*/5 10-14 * * 1-5";
 const lastHourCron = "0-30/5 15 * * 1-5";
@@ -186,13 +185,10 @@ const lastHour = schedule.scheduleJob(lastHourCron, () => {
   console.log("job is running");
   updateOi();
 });
-const dailyDbClear = schedule.scheduleJob(dailyDbClearCron, () => {
-  clearDb();
-  console.log("db is cleared");
-});
-const dailySymbolUp = schedule.scheduleJob(dailySymbolUpCron, () => {
+const dailyDbClear = schedule.scheduleJob(dailyDbClearCron, async () => {
+  await clearDb();
   storeSymbol();
-  console.log("symbols updated");
+  console.log("db is cleared");
 });
 
 //! ROUTING -------------------------------------------------------
@@ -258,35 +254,38 @@ app.get("/live-oicoi-ex/:symbol/:expiryDate", async (req, res) => {
     })
     .catch(errorHandler);
 
-  if (response.status === 200) {
+  if (response) {
     const opDatas = response.data.resultData.opDatas;
     const oiData = [];
     const spot = opDatas[0].index_close;
 
-    let strikeDiff = 1e9;
+    opDatas.sort((a, b) => a.strike_price - b.strike_price);
+    const strikeDiff = opDatas[1].strike_price - opDatas[0].strike_price;
 
-    for (let i = 21; i < opDatas.length; i++) {
-      strikeDiff = Math.min(
-        strikeDiff,
-        Math.abs(opDatas[20].strike_price - opDatas[i].strike_price)
-      );
-    }
-
+    console.log(strikeDiff);
     const atm = Math.ceil(spot / strikeDiff) * strikeDiff;
-    oiData.push({ atm: atm });
 
-    opDatas.forEach((element) => {
-      const sp = element.strike_price;
-      if (Math.abs(sp - atm) <= strikeDiff * 10) {
-        oiData.push({
-          strikePrice: sp,
-          callsOi: parseFloat((element.calls_oi / 100000).toFixed(2)),
-          callsCoi: parseFloat((element.calls_change_oi / 100000).toFixed(2)),
-          putsOi: parseFloat((element.puts_oi / 100000).toFixed(2)),
-          putsCoi: parseFloat((element.puts_change_oi / 100000).toFixed(2)),
-        });
+    let atmIndex = -1;
+    for (let i = 0; i < opDatas.length; i++) {
+      if (opDatas[i].strike_price === atm) {
+        atmIndex = i;
+        break;
       }
-    });
+    }
+    for (
+      let i = Math.max(0, atmIndex - 10);
+      i <= Math.min(opDatas.length, atmIndex + 10);
+      i++
+    ) {
+      const element = opDatas[i];
+      oiData.push({
+        strikePrice: element.strike_price,
+        callsOi: parseFloat((element.calls_oi / 100000).toFixed(2)),
+        callsCoi: parseFloat((element.calls_change_oi / 100000).toFixed(2)),
+        putsOi: parseFloat((element.puts_oi / 100000).toFixed(2)),
+        putsCoi: parseFloat((element.puts_change_oi / 100000).toFixed(2)),
+      });
+    }
     res.send(oiData);
   }
 });
@@ -300,7 +299,7 @@ app.get("/expiry-dates/:symbol", async (req, res) => {
     })
     .catch(errorHandler);
 
-  if (response.status === 200) {
+  if (response) {
     const expDates = response.data.resultData.opExpiryDates;
     res.send(expDates);
   }
@@ -312,7 +311,7 @@ app.get("/total-coi/:symbol", async (req, res) => {
   const Total = mongoose.model(symbol, oiDataSchema, symbol);
 
   const data = await Total.findOne({ strikePrice: 0 }).catch(errorHandler);
-  if (data !== undefined && data !== null) {
+  if (data) {
     const oi = data.oiArray;
     const oiLacs = oi.map((element) => {
       const time = element.time;
@@ -321,7 +320,7 @@ app.get("/total-coi/:symbol", async (req, res) => {
       const callLac = parseFloat((element.callsCoi / 100000).toFixed(2));
       let pcr = Math.abs(parseFloat((putLac / callLac).toFixed(2)));
       const oidiff = parseFloat((putLac - callLac).toFixed(2));
-      pcr = oidiff > 0 ? pcr : -pcr;
+      pcr = putLac > 0 ? pcr : -pcr;
       const eleLacs = {
         spot: spot,
         pcr: pcr,
@@ -344,7 +343,7 @@ app.get("/sp-data/:symbol/:strike", async (req, res) => {
 
   const data = await Sp.findOne({ strikePrice: strike }).catch(errorHandler);
 
-  if (data !== undefined && data !== null) {
+  if (data) {
     const oi = data.oiArray;
     const oiLacs = oi.map((element) => {
       const time = element.time;
@@ -371,7 +370,7 @@ app.get("/strikes-list/:symbol", async (req, res) => {
     })
     .catch(errorHandler);
 
-  if (response.status === 200) {
+  if (response) {
     const opDatas = response.data.resultData.opDatas;
     const spot = opDatas[0].index_close;
     const strikes = [];

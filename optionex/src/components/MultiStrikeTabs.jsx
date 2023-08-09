@@ -110,11 +110,13 @@ function MultiStrikeTabs({ symbol, mode }) {
           />
         ))}
       </div>
-      <MultiStrikeLineChart
-        symbol={symbol}
-        mode={mode}
-        checkedStrikes={checkedStrikes}
-      />
+      <div style={{ height: "95%" }}>
+        <MultiStrikeLineChart
+          symbol={symbol}
+          mode={mode}
+          checkedStrikes={checkedStrikes}
+        />
+      </div>
     </>
   );
 }
