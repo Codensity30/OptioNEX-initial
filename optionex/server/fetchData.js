@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 const axios = require("axios");
 const schedule = require("node-schedule");
 const cors = require("cors");
+const config = require("./config");
 
 //* function to handle error
 function errorHandler(error) {
@@ -15,7 +16,7 @@ function errorHandler(error) {
 
 //* connecting to database
 mongoose
-  .connect("mongodb://127.0.0.1/optionex")
+  .connect(config.dburi, { useNewUrlParser: true, useUnifiedTopology: true })
   .then("Connected to database")
   .catch(errorHandler);
 
@@ -262,7 +263,6 @@ app.get("/live-oicoi-ex/:symbol/:expiryDate", async (req, res) => {
     opDatas.sort((a, b) => a.strike_price - b.strike_price);
     const strikeDiff = opDatas[1].strike_price - opDatas[0].strike_price;
 
-    console.log(strikeDiff);
     const atm = Math.ceil(spot / strikeDiff) * strikeDiff;
 
     let atmIndex = -1;
