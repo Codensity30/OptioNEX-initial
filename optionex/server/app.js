@@ -16,7 +16,10 @@ function errorHandler(error) {
 
 //* connecting to database
 mongoose
-  .connect(config.dburi, { useNewUrlParser: true, useUnifiedTopology: true })
+  .connect(config.dburi, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
   .then("Connected to database")
   .catch(errorHandler);
 
