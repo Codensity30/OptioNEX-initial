@@ -162,7 +162,12 @@ async function updateOi() {
 }
 
 async function clearDb() {
-  await mongoose.connection.db.dropDatabase().catch(errorHandler);
+  await mongoose.connection.db.dropCollection("FINNIFTY").catch(errorHandler);
+  await mongoose.connection.db.dropCollection("BANKNIFTY").catch(errorHandler);
+  await mongoose.connection.db.dropCollection("NIFTY").catch(errorHandler);
+  await mongoose.connection.db
+    .dropCollection("symbol_lists")
+    .catch(errorHandler);
 }
 
 async function storeSymbol() {
@@ -172,26 +177,26 @@ async function storeSymbol() {
 //* sheduling jobs to run at certain interval and time
 
 process.env.TZ = "Asia/Kolkata";
-const dailyDbClearCron = "10 14 9 * * 1-5";
+const dailyDbClearCron = "50 14 9 * * 1-5";
 const firstHourCron = "15-59/5 9 * * 1-5";
 const daily5minCron = "*/5 10-14 * * 1-5";
 const lastHourCron = "0-30/5 15 * * 1-5";
 
-const daily5Min = schedule.scheduleJob(daily5minCron, () => {
+const daily5Min = schedule.scheduleJob(daily5minCron, async () => {
+  await updateOi();
   console.log("job is running");
-  updateOi();
 });
-const firstHour = schedule.scheduleJob(firstHourCron, () => {
+const firstHour = schedule.scheduleJob(firstHourCron, async () => {
+  await updateOi();
   console.log("job is running");
-  updateOi();
 });
-const lastHour = schedule.scheduleJob(lastHourCron, () => {
+const lastHour = schedule.scheduleJob(lastHourCron, async () => {
+  await updateOi();
   console.log("job is running");
-  updateOi();
 });
 const dailyDbClear = schedule.scheduleJob(dailyDbClearCron, async () => {
   await clearDb();
-  storeSymbol();
+  await storeSymbol();
   console.log("db is cleared");
 });
 

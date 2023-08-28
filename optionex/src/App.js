@@ -1,53 +1,14 @@
-import React, { useState } from "react";
-import { ThemeProvider, createTheme } from "@mui/material/styles";
-import CssBaseline from "@mui/material/CssBaseline";
-import CustomTabs from "./components/CustomTabs";
-import InputBar from "./components/InputBar";
+import React from "react";
+import { Route, Routes } from "react-router-dom";
+import Cockpit from "./components/Cockpit";
+import LandingPage from "./components/LandingPage";
 
 function App() {
-  const [symbol, setSymbol] = useState("NIFTY");
-  const [expiryDate, setExpiry] = useState("current");
-  const [mode, setMode] = useState("dark");
-
-  function handleSymbolChange(e, newValue) {
-    if (newValue != null) {
-      setSymbol(newValue);
-    }
-  }
-  function handleExpiryChange(e, newValue) {
-    if (newValue != null) {
-      setExpiry(newValue);
-    }
-  }
-
-  function handleModeChange() {
-    if (mode === "light") setMode("dark");
-    else setMode("light");
-  }
-
-  const Theme = createTheme({
-    palette: {
-      mode: mode,
-      background: {
-        default: mode === "light" ? "#efefef" : "#565656",
-      },
-    },
-  });
-
   return (
-    <ThemeProvider theme={Theme}>
-      <CssBaseline />
-      <div style={{ width: "100%", height: "100%" }}>
-        <InputBar
-          symbol={symbol}
-          mode={mode}
-          handleExpiryChange={handleExpiryChange}
-          handleSymbolChange={handleSymbolChange}
-          handleModeChange={handleModeChange}
-        />
-        <CustomTabs mode={mode} symbol={symbol} expiryDate={expiryDate} />
-      </div>
-    </ThemeProvider>
+    <Routes>
+      <Route path="/" element={<LandingPage />} />
+      <Route path="/cockpit" element={<Cockpit />} />
+    </Routes>
   );
 }
 
