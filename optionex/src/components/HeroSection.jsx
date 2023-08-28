@@ -4,7 +4,7 @@ import AllInclusiveIcon from "@mui/icons-material/AllInclusive";
 export default function Example() {
   return (
     <div className="bg-white">
-      <div className="fixed left-0 right-0 my-3">
+      <div className="fixed left-0 right-0 py-3 bg-white/30 backdrop-blur-md z-50 ">
         <div className="flex justify-center items-center gap-1">
           <div className="w-7 h-7">
             <img
