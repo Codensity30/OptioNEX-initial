@@ -10,7 +10,7 @@ import {
   TimelineRounded,
 } from "@mui/icons-material";
 
-const CustomTabs = ({ mode, symbol }) => {
+const CustomTabs = ({ mode, expiryDate, symbol, currentExpiry }) => {
   const [selectedTab, setSelectedTab] = useState(0); // State to keep track of selected tab index
 
   const handleTabChange = (event, newValue) => {
@@ -18,10 +18,11 @@ const CustomTabs = ({ mode, symbol }) => {
   };
 
   const disabled =
-    symbol === "NIFTY" ||
-    symbol === "BANKNIFTY" ||
-    symbol === "FINNIFTY" ||
-    symbol === "MIDCPNIFTY"
+    (symbol === "NIFTY" ||
+      symbol === "BANKNIFTY" ||
+      symbol === "FINNIFTY" ||
+      symbol === "MIDCPNIFTY") &&
+    (expiryDate === currentExpiry || expiryDate === "current")
       ? false
       : true;
 
@@ -47,8 +48,9 @@ const CustomTabs = ({ mode, symbol }) => {
             color: "grey",
           }}
         >
-          Oops! It looks like the feature you're trying to use is currently
-          available only for indices.
+          Uh-oh! It seems like the feature you're attempting to access is
+          currently available for indices and the current expiry. Hang tight,
+          we'll get you there soon!
         </div>
         <div
           style={{
@@ -57,7 +59,8 @@ const CustomTabs = ({ mode, symbol }) => {
             color: "grey",
           }}
         >
-          Try searching for NIFTY, BANKNIFTY, FINIFTY
+          Try searching for NIFTY, BANKNIFTY, FINIFTY or switch to Current
+          Expiry
         </div>
       </div>
     );

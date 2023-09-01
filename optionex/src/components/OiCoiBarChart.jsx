@@ -21,6 +21,7 @@ const OiCoiBarChart = ({ mode, symbol, expiryDate, oicoi }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        setIsDataFetched(false);
         const response = await axios.get(
           `http://localhost:8000/live-oicoi-ex/${symbol}/${expiryDate}`
         );

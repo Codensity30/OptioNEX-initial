@@ -10,6 +10,7 @@ function InputBar({
   mode,
   handleSymbolChange,
   handleExpiryChange,
+  handleCurrentExpiryChange,
   handleModeChange,
 }) {
   return (
@@ -28,7 +29,11 @@ function InputBar({
       elevation={3}
     >
       <InputBox handleChange={handleSymbolChange} />
-      <ExpiryBox handleChange={handleExpiryChange} symbol={symbol} />
+      <ExpiryBox
+        handleExpiryChange={handleExpiryChange}
+        symbol={symbol}
+        handleCurrentExpiryChange={handleCurrentExpiryChange}
+      />
       <IconButton aria-label="mode" onClick={handleModeChange}>
         {mode === "light" ? <DarkModeOutlined /> : <LightModeOutlined />}
       </IconButton>

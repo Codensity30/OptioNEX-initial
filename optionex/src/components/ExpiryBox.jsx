@@ -9,7 +9,11 @@ function errorHandler(error) {
   console.log(error);
 }
 
-export default function ExpiryBox({ handleChange, symbol }) {
+export default function ExpiryBox({
+  handleExpiryChange,
+  symbol,
+  handleCurrentExpiryChange,
+}) {
   const [expiryDates, setExpiry] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -23,6 +27,7 @@ export default function ExpiryBox({ handleChange, symbol }) {
         const exp = temp.map((ele) => {
           return ele.split("T")[0];
         });
+        handleCurrentExpiryChange(exp[0]);
         setExpiry(exp);
         setLoading(false);
       } catch (error) {
@@ -39,10 +44,10 @@ export default function ExpiryBox({ handleChange, symbol }) {
   return (
     <Autocomplete
       disablePortal
-      value={expiryDates[0]}
+      defaultValue={expiryDates[0]}
       options={expiryDates}
       sx={{ width: 300 }}
-      onChange={handleChange}
+      onChange={handleExpiryChange}
       renderInput={(params) => <TextField {...params} label="Expiry Date" />}
     />
   );

@@ -55,3 +55,24 @@
 .loader11 rect:nth-of-type(6) {
   animation-delay: 0.05s;
 }
+.font-Raleway {
+  font-family: "Raleway", sans-serif;
+}
+.font-Poppins {
+  font-family: "Poppins", sans-serif;
+}
+@layer utilities {
+  /* Chrome, Safari and Opera */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .no-scrollbar {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+  }
+}
+.invest-ideas-container {
+  overflow: hidden;
+  background: radial-gradient(100% 50% at bottom, transparent 64%, #f4faff 48%);
+}

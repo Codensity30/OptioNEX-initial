@@ -4,7 +4,7 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import MultiStrikeLineChart from "./MultiStrikeLineChart";
 import axios from "axios";
 
-function MultiStrikeTabs({ symbol, mode }) {
+function MultiStrikeTabs({ symbol, mode, expiryDate, currentExpiry }) {
   const [checkedStrikes, setCheckedStrikes] = useState([]);
 
   const handleCheckboxChange = (strike) => {
@@ -39,15 +39,15 @@ function MultiStrikeTabs({ symbol, mode }) {
       const s2 = strikes[5];
       const s3 = strikes[7];
       setCheckedStrikes([s1, s2, s3]);
-      console.log(checkedStrikes);
     }
   }, [strikes]);
 
   const disabled =
-    symbol === "NIFTY" ||
-    symbol === "BANKNIFTY" ||
-    symbol === "FINNIFTY" ||
-    symbol === "MIDCPNIFTY"
+    (symbol === "NIFTY" ||
+      symbol === "BANKNIFTY" ||
+      symbol === "FINNIFTY" ||
+      symbol === "MIDCPNIFTY") &&
+    (expiryDate === currentExpiry || expiryDate === "current")
       ? false
       : true;
 
@@ -73,8 +73,9 @@ function MultiStrikeTabs({ symbol, mode }) {
             color: "grey",
           }}
         >
-          Oops! It looks like the feature you're trying to use is currently
-          available only for indices.
+          Uh-oh! It seems like the feature you're attempting to access is
+          currently available for indices and the current expiry. Hang tight,
+          we'll get you there soon!
         </div>
         <div
           style={{
@@ -83,7 +84,8 @@ function MultiStrikeTabs({ symbol, mode }) {
             color: "grey",
           }}
         >
-          Try searching for NIFTY, BANKNIFTY, FINIFTY
+          Try searching for NIFTY, BANKNIFTY, FINIFTY or switch to Current
+          Expiry
         </div>
       </>
     );

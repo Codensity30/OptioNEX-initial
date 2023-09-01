@@ -12,9 +12,8 @@ import {
 } from "@mui/icons-material";
 import MultiStrikeTabs from "./MultiStrikeTabs";
 
-const CustomTabs = ({ mode, symbol, expiryDate }) => {
+const CustomTabs = ({ mode, symbol, expiryDate, currentExpiry }) => {
   const [selectedTab, setSelectedTab] = useState(0);
-
   const handleTabChange = (event, newValue) => {
     setSelectedTab(newValue);
   };
@@ -54,8 +53,22 @@ const CustomTabs = ({ mode, symbol, expiryDate }) => {
             expiryDate={expiryDate}
           />
         )}
-        {selectedTab === 1 && <DataVsTimeTabs symbol={symbol} mode={mode} />}
-        {selectedTab === 2 && <MultiStrikeTabs symbol={symbol} mode={mode} />}
+        {selectedTab === 1 && (
+          <DataVsTimeTabs
+            symbol={symbol}
+            expiryDate={expiryDate}
+            mode={mode}
+            currentExpiry={currentExpiry}
+          />
+        )}
+        {selectedTab === 2 && (
+          <MultiStrikeTabs
+            symbol={symbol}
+            expiryDate={expiryDate}
+            mode={mode}
+            currentExpiry={currentExpiry}
+          />
+        )}
       </Box>
     </Paper>
   );

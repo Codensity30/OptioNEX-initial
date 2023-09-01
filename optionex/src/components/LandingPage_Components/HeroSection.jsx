@@ -4,11 +4,11 @@ import AllInclusiveIcon from "@mui/icons-material/AllInclusive";
 export default function Example() {
   return (
     <div className="bg-white">
-      <div className="fixed left-0 right-0 py-3 bg-white/30 backdrop-blur-md z-50 ">
+      <div className="fixed left-0 right-0 py-3 bg-white/50 backdrop-blur z-50 ">
         <div className="flex justify-center items-center gap-1">
           <div className="w-7 h-7">
             <img
-              src={require("../images/optionex_logo.png")}
+              src={require("../../images/optionex_logo.png")}
               alt="Optionex logo"
               className="object-contain"
             />
@@ -16,7 +16,7 @@ export default function Example() {
           <h1 className="text-slate-800 text-lg">
             Optio
             <span className="bg-clip-text text-transparent bg-gradient-to-br from-sky-500 to-teal-500 font-semibold ">
-              NEX
+              NXT
             </span>
           </h1>
         </div>
@@ -43,7 +43,7 @@ export default function Example() {
                 <p class="text-slate-700 gap-1 flex justify-center items-center">
                   Be your
                   <span className="bg-clip-text text-transparent bg-gradient-to-br from-sky-500 to-teal-500">
-                    NEX
+                    NXT
                   </span>
                   <span className="text-cyan-500">
                     <AllInclusiveIcon />
@@ -53,14 +53,14 @@ export default function Example() {
             </div>
           </div>
           <div className="text-center">
-            <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl">
+            <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl font-Raleway">
               Elevate your trading to a whole new{" "}
               <span className="bg-clip-text text-transparent bg-gradient-to-br from-sky-500 to-teal-500">
-                NEX
+                NXT
               </span>{" "}
               level
             </h1>
-            <p className="mt-6 text-lg leading-8 text-gray-600">
+            <p className="mt-6 text-lg leading-8 text-gray-600 font-Raleway">
               Empower your market journey: Unveil an exceptional indicator that
               rhythms and swirls in harmony with the ebb and flow of financial
               tides, giving you the unmatched edge you seek
@@ -68,9 +68,9 @@ export default function Example() {
             <div className="mt-10 flex items-center justify-center gap-x-6">
               <a
                 href="#"
-                className="rounded-md bg-gradient-to-br from-sky-500 to-teal-500 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:shadow-lg"
+                className="text-sm rounded-md bg-gradient-to-br from-sky-500 to-teal-500 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:shadow-lg"
               >
-                Get started
+                Get Started
               </a>
               <a
                 href="#"

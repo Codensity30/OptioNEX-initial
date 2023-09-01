@@ -215,6 +215,12 @@ app.get("/update-oiData", async (req, res) => {
   res.send("Initialize the database");
 });
 
+app.get("/clear-db", async (req, res) => {
+  await clearDb();
+  await storeSymbol();
+  res.send("db is cleared");
+});
+
 app.get("/symbol-list", async (req, res) => {
   try {
     const Symbol = mongoose.model("symbol_list", symbolListSchema);
@@ -268,25 +274,27 @@ app.get("/live-oicoi-ex/:symbol/:expiryDate", async (req, res) => {
     const oiData = [];
     const spot = opDatas[0].index_close;
 
+    // sorting the api data and finding the atm
     opDatas.sort((a, b) => a.strike_price - b.strike_price);
-    const strikeDiff = opDatas[1].strike_price - opDatas[0].strike_price;
-
-    const atm = Math.ceil(spot / strikeDiff) * strikeDiff;
-
-    let atmIndex = -1;
+    let atm = -1,
+      atmIndex = -1;
     for (let i = 0; i < opDatas.length; i++) {
-      if (opDatas[i].strike_price === atm) {
+      if (opDatas[i].strike_price - spot >= 0) {
+        atm = opDatas[i].strike_price;
         atmIndex = i;
         break;
       }
     }
+
+    // filtering data to show only 10 strikes up and down of atm
     for (
       let i = Math.max(0, atmIndex - 10);
-      i <= Math.min(opDatas.length, atmIndex + 10);
+      i < Math.min(opDatas.length, atmIndex + 11);
       i++
     ) {
       const element = opDatas[i];
       oiData.push({
+        atm: atm,
         strikePrice: element.strike_price,
         callsOi: parseFloat((element.calls_oi / 100000).toFixed(2)),
         callsCoi: parseFloat((element.calls_change_oi / 100000).toFixed(2)),

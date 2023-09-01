@@ -1,7 +1,7 @@
 import React from "react";
 import { Route, Routes } from "react-router-dom";
 import Cockpit from "./components/Cockpit";
-import LandingPage from "./components/LandingPage";
+import LandingPage from "./components/LandingPage_Components/LandingPage";
 
 function App() {
   return (

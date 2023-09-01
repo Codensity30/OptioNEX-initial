@@ -7,6 +7,7 @@ import InputBar from "./InputBar";
 function Cockpit() {
   const [symbol, setSymbol] = useState("NIFTY");
   const [expiryDate, setExpiry] = useState("current");
+  const [currentExpiry, setCurrentExpiry] = useState("current");
   const [mode, setMode] = useState("dark");
 
   function handleSymbolChange(e, newValue) {
@@ -17,6 +18,12 @@ function Cockpit() {
   function handleExpiryChange(e, newValue) {
     if (newValue != null) {
       setExpiry(newValue);
+    }
+  }
+
+  function handleCurrentExpiryChange(newValue) {
+    if (newValue != null) {
+      setCurrentExpiry(newValue);
     }
   }
 
@@ -44,8 +51,14 @@ function Cockpit() {
           handleExpiryChange={handleExpiryChange}
           handleSymbolChange={handleSymbolChange}
           handleModeChange={handleModeChange}
+          handleCurrentExpiryChange={handleCurrentExpiryChange}
         />
-        <CustomTabs mode={mode} symbol={symbol} expiryDate={expiryDate} />
+        <CustomTabs
+          mode={mode}
+          symbol={symbol}
+          expiryDate={expiryDate}
+          currentExpiry={currentExpiry}
+        />
       </div>
     </ThemeProvider>
   );
