@@ -3,8 +3,9 @@ import { ThemeProvider, createTheme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import CustomTabs from "./CustomTabs";
 import InputBar from "./InputBar";
+import Header from "./LandingPage_Components/Header";
 
-function Cockpit() {
+function Terminal() {
   const [symbol, setSymbol] = useState("NIFTY");
   const [expiryDate, setExpiry] = useState("current");
   const [currentExpiry, setCurrentExpiry] = useState("current");
@@ -44,13 +45,12 @@ function Cockpit() {
   return (
     <ThemeProvider theme={Theme}>
       <CssBaseline />
-      <div style={{ width: "100%", height: "100%" }}>
+      <div style={{ width: "100%", height: "100%", paddingBottom: "50px" }}>
+        <Header mode={mode} handleModeChange={handleModeChange} />
         <InputBar
           symbol={symbol}
-          mode={mode}
           handleExpiryChange={handleExpiryChange}
           handleSymbolChange={handleSymbolChange}
-          handleModeChange={handleModeChange}
           handleCurrentExpiryChange={handleCurrentExpiryChange}
         />
         <CustomTabs
@@ -64,4 +64,4 @@ function Cockpit() {
   );
 }
 
-export default Cockpit;
+export default Terminal;

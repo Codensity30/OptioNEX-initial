@@ -1,6 +1,6 @@
 import React from "react";
 
-function FooterSection() {
+function Footer() {
   return (
     <>
       <footer className="relative bg-slate-200 pt-8 pb-6">
@@ -79,4 +79,4 @@ function FooterSection() {
   );
 }
 
-export default FooterSection;
+export default Footer;

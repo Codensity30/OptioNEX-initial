@@ -1,8 +1,9 @@
 import { React, useEffect, useState } from "react";
+import axios from "axios";
 import Checkbox from "@mui/material/Checkbox";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import MultiStrikeLineChart from "./MultiStrikeLineChart";
-import axios from "axios";
+import LoaderH from "./LoaderH";
 
 function MultiStrikeTabs({ symbol, mode, expiryDate, currentExpiry }) {
   const [checkedStrikes, setCheckedStrikes] = useState([]);
@@ -43,10 +44,7 @@ function MultiStrikeTabs({ symbol, mode, expiryDate, currentExpiry }) {
   }, [strikes]);
 
   const disabled =
-    (symbol === "NIFTY" ||
-      symbol === "BANKNIFTY" ||
-      symbol === "FINNIFTY" ||
-      symbol === "MIDCPNIFTY") &&
+    (symbol === "NIFTY" || symbol === "BANKNIFTY" || symbol === "FINNIFTY") &&
     (expiryDate === currentExpiry || expiryDate === "current")
       ? false
       : true;
@@ -74,8 +72,7 @@ function MultiStrikeTabs({ symbol, mode, expiryDate, currentExpiry }) {
           }}
         >
           Uh-oh! It seems like the feature you're attempting to access is
-          currently available for indices and the current expiry. Hang tight,
-          we'll get you there soon!
+          currently available for indices and the current expiry.
         </div>
         <div
           style={{
@@ -84,15 +81,28 @@ function MultiStrikeTabs({ symbol, mode, expiryDate, currentExpiry }) {
             color: "grey",
           }}
         >
-          Try searching for NIFTY, BANKNIFTY, FINIFTY or switch to Current
-          Expiry
+          Hang tight, we'll get you there soon!
+        </div>
+        <div
+          style={{
+            textAlign: "center",
+            fontFamily: "Comic Sans MS, 'Arial Rounded MT Bold', sans-serif",
+            color: "grey",
+          }}
+        >
+          Try searching for NIFTY, BANKNIFTY, FINIFTY, MIDCPNIFTY or switch to
+          Current Expiry
         </div>
       </>
     );
   }
 
   if (!isDataFetched) {
-    return "Loading...";
+    return (
+      <div className="flex justify-center">
+        <LoaderH />
+      </div>
+    );
   }
 
   return (

@@ -57,7 +57,14 @@ const CoiLineChart = ({ mode, symbol, checkedStrikes }) => {
 
   if (!isDataFetched) {
     return (
-      <div style={{ display: "flex", alignItems: "center", height: "100%" }}>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          height: "100%",
+          justifyContent: "center",
+        }}
+      >
         <Loader />
       </div>
     );

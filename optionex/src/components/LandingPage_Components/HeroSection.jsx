@@ -1,27 +1,10 @@
 import VideocamOutlinedIcon from "@mui/icons-material/VideocamOutlined";
 import AllInclusiveIcon from "@mui/icons-material/AllInclusive";
+import { Link } from "react-router-dom";
 
 export default function Example() {
   return (
     <div className="bg-white">
-      <div className="fixed left-0 right-0 py-3 bg-white/50 backdrop-blur z-50 ">
-        <div className="flex justify-center items-center gap-1">
-          <div className="w-7 h-7">
-            <img
-              src={require("../../images/optionex_logo.png")}
-              alt="Optionex logo"
-              className="object-contain"
-            />
-          </div>
-          <h1 className="text-slate-800 text-lg">
-            Optio
-            <span className="bg-clip-text text-transparent bg-gradient-to-br from-sky-500 to-teal-500 font-semibold ">
-              NXT
-            </span>
-          </h1>
-        </div>
-      </div>
-
       <div className="relative isolate px-6 pt-14 lg:px-8">
         <div
           className="absolute inset-x-0 -top-40 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-80"
@@ -66,12 +49,12 @@ export default function Example() {
               tides, giving you the unmatched edge you seek
             </p>
             <div className="mt-10 flex items-center justify-center gap-x-6">
-              <a
-                href="#"
-                className="text-sm rounded-md bg-gradient-to-br from-sky-500 to-teal-500 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:shadow-lg"
+              <Link
+                to={"/terminal"}
+                className="text-sm rounded-md bg-gradient-to-br from-sky-500 to-teal-500 px-3.5 py-2.5 font-semibold text-white shadow-sm hover:shadow-lg"
               >
-                Get Started
-              </a>
+                Terminal
+              </Link>
               <a
                 href="#"
                 className="text-sm font-semibold flex items-center gap-2 leading-6 text-gray-900"

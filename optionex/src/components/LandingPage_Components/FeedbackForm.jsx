@@ -1,4 +1,6 @@
 import { useState } from "react";
+import axios from "axios";
+import Alert from "@mui/material/Alert";
 
 export default function FeedbackForm() {
   const [showModal, setShowModal] = useState(false);
@@ -7,6 +9,8 @@ export default function FeedbackForm() {
     email: "",
     message: "",
   });
+  const [alert, setAlert] = useState(false);
+  const [alertMsg, setAlertMsg] = useState("");
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -15,19 +19,51 @@ export default function FeedbackForm() {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    setShowModal(false);
-    alert(
-      `Name: ${formData.name}, Email: ${formData.email}, Message: ${formData.message}`
-    );
-    setFormData({
-      name: "",
-      email: "",
-      message: "",
-    });
+    axios
+      .post("http://localhost:8000/feedback", {
+        name: formData.name,
+        email: formData.email,
+        message: formData.message,
+      })
+      .then(() => {
+        setFormData({
+          name: "",
+          email: "",
+          message: "",
+        });
+        setAlertMsg(
+          "Awesome! Your feedback has been successfully submitted. Thank you for sharing your thoughts with us!"
+        );
+        setAlert(true);
+        setShowModal(false);
+      })
+      .catch(() => {
+        setAlertMsg(
+          "Oops! Something went wrong. Don't worry, let's give it another shot."
+        );
+        setAlert(true);
+      });
   };
 
   return (
     <>
+      {alert && (
+        <div style={{ marginTop: "20px" }}>
+          <Alert
+            severity={
+              alertMsg ===
+              "Oops! Something went wrong. Don't worry, let's give it another shot."
+                ? "error"
+                : "success"
+            }
+            onClose={() => {
+              setAlert(false);
+            }}
+          >
+            {alertMsg}
+          </Alert>
+        </div>
+      )}
       <button
         className="font-Poppins text-sm bg-gradient-to-tr from-purple-600 to-pink-600 text-white p-3 rounded-md block mx-auto mt-10 hover:shadow-lg hover:shadow-purple-900 before:ease-linear transition-all duration-150"
         onClick={() => setShowModal(true)}

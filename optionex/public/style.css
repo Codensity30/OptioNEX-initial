@@ -33,7 +33,7 @@
     y: 20;
   }
 }
-
+/* Vertical Loader */
 .loader11 rect {
   animation: 2s ease loader11 infinite;
 }
@@ -55,6 +55,73 @@
 .loader11 rect:nth-of-type(6) {
   animation-delay: 0.05s;
 }
+
+/* Horizontal Loader */
+@keyframes loader6dot1 {
+  0% {
+    fill: #3a3a3a;
+    transform: scale(1);
+  }
+  16% {
+    transform: scale(1.5);
+    fill: #33a3e3;
+  }
+  70%,
+  100% {
+    transform: scale(1);
+    fill: #3a3a3a;
+  }
+}
+
+@keyframes loader6dot2 {
+  0%,
+  30% {
+    transform: scale(1);
+    fill: #3a3a3a;
+  }
+  47% {
+    transform: scale(1.5);
+    fill: #33a3e3;
+  }
+  75%,
+  100% {
+    transform: scale(1);
+    fill: #3a3a3a;
+  }
+}
+
+@keyframes loader6dot3 {
+  0%,
+  47% {
+    transform: scale(1);
+    fill: #3a3a3a;
+  }
+  83% {
+    transform: scale(1.5);
+    fill: #33a3e3;
+  }
+  100% {
+    transform: scale(1);
+    fill: #3a3a3a;
+  }
+}
+.loader6 svg {
+  overflow: visible;
+}
+
+.loader6 circle:first-of-type {
+  transform-origin: 5px center;
+  animation: loader6dot1 1.5s ease infinite;
+}
+.loader6 circle:nth-child(2) {
+  transform-origin: center;
+  animation: loader6dot2 1.5s ease infinite;
+}
+.loader6 circle:nth-child(3) {
+  transform-origin: 35px center;
+  animation: loader6dot3 1.5s ease infinite;
+}
+
 .font-Raleway {
   font-family: "Raleway", sans-serif;
 }

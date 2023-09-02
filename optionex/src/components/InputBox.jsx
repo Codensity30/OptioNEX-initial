@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
+import LoaderH from "./LoaderH";
 
 export default function InputBox({ handleChange }) {
   const [symbols, setSymbols] = useState([]);
@@ -23,7 +24,7 @@ export default function InputBox({ handleChange }) {
   }, []);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <LoaderH />;
   }
 
   return (

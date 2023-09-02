@@ -18,10 +18,7 @@ const CustomTabs = ({ mode, expiryDate, symbol, currentExpiry }) => {
   };
 
   const disabled =
-    (symbol === "NIFTY" ||
-      symbol === "BANKNIFTY" ||
-      symbol === "FINNIFTY" ||
-      symbol === "MIDCPNIFTY") &&
+    (symbol === "NIFTY" || symbol === "BANKNIFTY" || symbol === "FINNIFTY") &&
     (expiryDate === currentExpiry || expiryDate === "current")
       ? false
       : true;
@@ -49,8 +46,7 @@ const CustomTabs = ({ mode, expiryDate, symbol, currentExpiry }) => {
           }}
         >
           Uh-oh! It seems like the feature you're attempting to access is
-          currently available for indices and the current expiry. Hang tight,
-          we'll get you there soon!
+          currently available for indices and the current expiry.
         </div>
         <div
           style={{
@@ -59,8 +55,17 @@ const CustomTabs = ({ mode, expiryDate, symbol, currentExpiry }) => {
             color: "grey",
           }}
         >
-          Try searching for NIFTY, BANKNIFTY, FINIFTY or switch to Current
-          Expiry
+          Hang tight, we'll get you there soon!
+        </div>
+        <div
+          style={{
+            textAlign: "center",
+            fontFamily: "Comic Sans MS, 'Arial Rounded MT Bold', sans-serif",
+            color: "grey",
+          }}
+        >
+          Till then, Try searching for NIFTY, BANKNIFTY, FINIFTY or switch to
+          Current Expiry
         </div>
       </div>
     );

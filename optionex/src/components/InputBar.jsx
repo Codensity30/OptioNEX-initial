@@ -1,17 +1,13 @@
 import React from "react";
 import InputBox from "./InputBox";
 import ExpiryBox from "./ExpiryBox";
-import IconButton from "@mui/material/IconButton";
 import Paper from "@mui/material/Paper";
-import { DarkModeOutlined, LightModeOutlined } from "@mui/icons-material";
 
 function InputBar({
   symbol,
-  mode,
   handleSymbolChange,
   handleExpiryChange,
   handleCurrentExpiryChange,
-  handleModeChange,
 }) {
   return (
     <Paper
@@ -24,7 +20,7 @@ function InputBar({
         p: 3,
         gap: 7,
         height: "10%",
-        marginTop: "30px",
+        marginTop: "80px",
       }}
       elevation={3}
     >
@@ -34,9 +30,6 @@ function InputBar({
         symbol={symbol}
         handleCurrentExpiryChange={handleCurrentExpiryChange}
       />
-      <IconButton aria-label="mode" onClick={handleModeChange}>
-        {mode === "light" ? <DarkModeOutlined /> : <LightModeOutlined />}
-      </IconButton>
     </Paper>
   );
 }

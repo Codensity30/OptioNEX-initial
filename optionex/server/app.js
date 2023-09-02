@@ -5,6 +5,7 @@ const axios = require("axios");
 const schedule = require("node-schedule");
 const cors = require("cors");
 const config = require("./config");
+const bodyParser = require("body-parser");
 
 //* function to handle error
 function errorHandler(error) {
@@ -26,7 +27,25 @@ mongoose
 //* intializing express server
 const port = 8000;
 const app = express();
+
+//* Allow the following IPs
+const allowed = (ip) => {
+  const ips = ["::1"];
+  return ips.includes(ip);
+};
+//* setting up the middlewares
+app.use(function (req, res, next) {
+  if (allowed(req.ip)) next();
+  else
+    res.status(401).end(
+      JSON.stringify({
+        error: 401,
+        msg: "Please provide valid token",
+      })
+    );
+});
 app.use(cors());
+app.use(bodyParser.json());
 
 //! MONGOOSE SCHEMA ----------------------------------
 
@@ -35,7 +54,6 @@ const symbolListSchema = new mongoose.Schema({
   symbolName: String,
   lotSize: Number,
 });
-
 //* type of object within the oiArray
 const oi = {
   spot: Number,
@@ -47,6 +65,11 @@ const oi = {
 const oiDataSchema = new mongoose.Schema({
   strikePrice: Number,
   oiArray: [oi],
+});
+const feedbackSchema = new mongoose.Schema({
+  name: String,
+  email: String,
+  message: String,
 });
 
 //! SCHEDULING THE JOBS------------------------------------------
@@ -204,15 +227,20 @@ const dailyDbClear = schedule.scheduleJob(dailyDbClearCron, async () => {
 
 //* endpoint for internal purposes
 app.get("/update-oiData", async (req, res) => {
-  const symList = ["NIFTY", "BANKNIFTY", "FINNIFTY"];
+  try {
+    const symList = ["NIFTY", "BANKNIFTY", "FINNIFTY"];
 
-  const requests = symList.map((element) => {
-    return getAndStore(element);
-  });
+    const requests = symList.map((element) => {
+      return getAndStore(element);
+    });
 
-  await Promise.all(requests).catch(errorHandler);
+    await Promise.all(requests).catch(errorHandler);
 
-  res.send("Initialize the database");
+    res.send("Initialize the database");
+  } catch (error) {
+    errorHandler(error);
+    res.status(500).send("Internal Server Error");
+  }
 });
 
 app.get("/clear-db", async (req, res) => {
@@ -239,175 +267,222 @@ app.get("/symbol-list", async (req, res) => {
 
 //* endpoint to record symbols lists in database
 app.get("/symbol-store", async (req, res) => {
-  const url = "https://webapi.niftytrader.in/webapi/symbol/psymbol-list";
+  try {
+    const url = "https://webapi.niftytrader.in/webapi/symbol/psymbol-list";
 
-  const response = await axios.get(url).catch(errorHandler);
-  const data = response.data.resultData;
+    const response = await axios.get(url).catch(errorHandler);
+    const data = response.data.resultData;
 
-  const Symbol = mongoose.model("symbol_list", symbolListSchema);
+    const Symbol = mongoose.model("symbol_list", symbolListSchema);
 
-  await Symbol.collection.drop().catch(errorHandler);
+    await Symbol.collection.drop().catch(errorHandler);
 
-  data.forEach(async (element) => {
-    await Symbol.create({
-      symbolName: element.symbol_name,
-      lotSize: element.lot_size,
+    data.forEach(async (element) => {
+      await Symbol.create({
+        symbolName: element.symbol_name,
+        lotSize: element.lot_size,
+      });
     });
-  });
-  res.send("Symbols stored");
+    res.send("Symbols stored");
+  } catch (error) {
+    errorHandler(error);
+    res.status(500).send("Internal Server Error");
+  }
 });
 
 //* endpoint to fetch the live oi data of the specified expiry
 app.get("/live-oicoi-ex/:symbol/:expiryDate", async (req, res) => {
-  const { symbol, expiryDate } = req.params;
+  try {
+    const { symbol, expiryDate } = req.params;
 
-  const url = "https://webapi.niftytrader.in/webapi/option/fatch-option-chain";
+    const url =
+      "https://webapi.niftytrader.in/webapi/option/fatch-option-chain";
 
-  const response = await axios
-    .get(url, {
-      params: { symbol: symbol, expiryDate: expiryDate },
-    })
-    .catch(errorHandler);
+    const response = await axios
+      .get(url, {
+        params: { symbol: symbol, expiryDate: expiryDate },
+      })
+      .catch(errorHandler);
 
-  if (response) {
-    const opDatas = response.data.resultData.opDatas;
-    const oiData = [];
-    const spot = opDatas[0].index_close;
+    if (response) {
+      const opDatas = response.data.resultData.opDatas;
+      const oiData = [];
+      const spot = opDatas[0].index_close;
 
-    // sorting the api data and finding the atm
-    opDatas.sort((a, b) => a.strike_price - b.strike_price);
-    let atm = -1,
-      atmIndex = -1;
-    for (let i = 0; i < opDatas.length; i++) {
-      if (opDatas[i].strike_price - spot >= 0) {
-        atm = opDatas[i].strike_price;
-        atmIndex = i;
-        break;
+      // sorting the api data and finding the atm
+      opDatas.sort((a, b) => a.strike_price - b.strike_price);
+      let atm = -1,
+        atmIndex = -1;
+      for (let i = 0; i < opDatas.length; i++) {
+        if (opDatas[i].strike_price - spot >= 0) {
+          atm = opDatas[i].strike_price;
+          atmIndex = i;
+          break;
+        }
       }
-    }
 
-    // filtering data to show only 10 strikes up and down of atm
-    for (
-      let i = Math.max(0, atmIndex - 10);
-      i < Math.min(opDatas.length, atmIndex + 11);
-      i++
-    ) {
-      const element = opDatas[i];
-      oiData.push({
-        atm: atm,
-        strikePrice: element.strike_price,
-        callsOi: parseFloat((element.calls_oi / 100000).toFixed(2)),
-        callsCoi: parseFloat((element.calls_change_oi / 100000).toFixed(2)),
-        putsOi: parseFloat((element.puts_oi / 100000).toFixed(2)),
-        putsCoi: parseFloat((element.puts_change_oi / 100000).toFixed(2)),
-      });
+      // filtering data to show only 10 strikes up and down of atm
+      for (
+        let i = Math.max(0, atmIndex - 10);
+        i < Math.min(opDatas.length, atmIndex + 11);
+        i++
+      ) {
+        const element = opDatas[i];
+        oiData.push({
+          atm: atm,
+          strikePrice: element.strike_price,
+          callsOi: parseFloat((element.calls_oi / 100000).toFixed(2)),
+          callsCoi: parseFloat((element.calls_change_oi / 100000).toFixed(2)),
+          putsOi: parseFloat((element.puts_oi / 100000).toFixed(2)),
+          putsCoi: parseFloat((element.puts_change_oi / 100000).toFixed(2)),
+        });
+      }
+      res.send(oiData);
     }
-    res.send(oiData);
+  } catch (error) {
+    errorHandler(error);
+    res.status(500).send("Internal Server Error");
   }
 });
 
 app.get("/expiry-dates/:symbol", async (req, res) => {
-  const symbol = req.params.symbol;
-  const url = "https://webapi.niftytrader.in/webapi/option/fatch-option-chain";
-  const response = await axios
-    .get(url, {
-      params: { symbol: symbol, expiryDate: "current" },
-    })
-    .catch(errorHandler);
+  try {
+    const symbol = req.params.symbol;
+    const url =
+      "https://webapi.niftytrader.in/webapi/option/fatch-option-chain";
+    const response = await axios
+      .get(url, {
+        params: { symbol: symbol, expiryDate: "current" },
+      })
+      .catch(errorHandler);
 
-  if (response) {
-    const expDates = response.data.resultData.opExpiryDates;
-    res.send(expDates);
+    if (response) {
+      const expDates = response.data.resultData.opExpiryDates;
+      res.send(expDates);
+    }
+  } catch (error) {
+    errorHandler(error);
+    res.status(500).send("Internal Server Error");
   }
 });
 
 app.get("/total-coi/:symbol", async (req, res) => {
-  const symbol = req.params.symbol;
+  try {
+    const symbol = req.params.symbol;
 
-  const Total = mongoose.model(symbol, oiDataSchema, symbol);
+    const Total = mongoose.model(symbol, oiDataSchema, symbol);
 
-  const data = await Total.findOne({ strikePrice: 0 }).catch(errorHandler);
-  if (data) {
-    const oi = data.oiArray;
-    const oiLacs = oi.map((element) => {
-      const time = element.time;
-      const spot = element.spot;
-      const putLac = parseFloat((element.putsCoi / 100000).toFixed(2));
-      const callLac = parseFloat((element.callsCoi / 100000).toFixed(2));
-      let pcr = Math.abs(parseFloat((putLac / callLac).toFixed(2)));
-      const oidiff = parseFloat((putLac - callLac).toFixed(2));
-      pcr = putLac > 0 ? pcr : -pcr;
-      const eleLacs = {
-        spot: spot,
-        pcr: pcr,
-        oidiff: oidiff,
-        time: time,
-        putsCoi: putLac,
-        callsCoi: callLac,
-      };
-      return eleLacs;
-    });
-    res.send(oiLacs);
+    const data = await Total.findOne({ strikePrice: 0 }).catch(errorHandler);
+    if (data) {
+      const oi = data.oiArray;
+      const oiLacs = oi.map((element) => {
+        const time = element.time;
+        const spot = element.spot;
+        const putLac = parseFloat((element.putsCoi / 100000).toFixed(2));
+        const callLac = parseFloat((element.callsCoi / 100000).toFixed(2));
+        let pcr = Math.abs(parseFloat((putLac / callLac).toFixed(2)));
+        const oidiff = parseFloat((putLac - callLac).toFixed(2));
+        pcr = putLac > 0 ? pcr : -pcr;
+        const eleLacs = {
+          spot: spot,
+          pcr: pcr,
+          oidiff: oidiff,
+          time: time,
+          putsCoi: putLac,
+          callsCoi: callLac,
+        };
+        return eleLacs;
+      });
+      res.send(oiLacs);
+    }
+  } catch (error) {
+    errorHandler(error);
+    res.status(500).send("Internal Server Error");
   }
 });
 
 app.get("/sp-data/:symbol/:strike", async (req, res) => {
-  const symbol = req.params.symbol;
-  const strike = parseInt(req.params.strike);
+  try {
+    const symbol = req.params.symbol;
+    const strike = parseInt(req.params.strike);
 
-  const Sp = mongoose.model(symbol, oiDataSchema, symbol);
+    const Sp = mongoose.model(symbol, oiDataSchema, symbol);
 
-  const data = await Sp.findOne({ strikePrice: strike }).catch(errorHandler);
+    const data = await Sp.findOne({ strikePrice: strike }).catch(errorHandler);
 
-  if (data) {
-    const oi = data.oiArray;
-    const oiLacs = oi.map((element) => {
-      const time = element.time;
-      const putLac = parseFloat((element.putsCoi / 100000).toFixed(2));
-      const callLac = parseFloat((element.callsCoi / 100000).toFixed(2));
-      const oidiff = parseFloat((putLac - callLac).toFixed(2));
-      const eleLacs = {
-        oidiff: oidiff,
-        time: time,
-      };
-      return eleLacs;
-    });
-    res.send(oiLacs);
+    if (data) {
+      const oi = data.oiArray;
+      const oiLacs = oi.map((element) => {
+        const time = element.time;
+        const putLac = parseFloat((element.putsCoi / 100000).toFixed(2));
+        const callLac = parseFloat((element.callsCoi / 100000).toFixed(2));
+        const oidiff = parseFloat((putLac - callLac).toFixed(2));
+        const eleLacs = {
+          oidiff: oidiff,
+          time: time,
+        };
+        return eleLacs;
+      });
+      res.send(oiLacs);
+    }
+  } catch (error) {
+    errorHandler(error);
+    res.status(500).send("Internal Server Error");
   }
 });
 
 app.get("/strikes-list/:symbol", async (req, res) => {
-  const symbol = req.params.symbol;
-  const url = "https://webapi.niftytrader.in/webapi/option/fatch-option-chain";
+  try {
+    const symbol = req.params.symbol;
+    const url =
+      "https://webapi.niftytrader.in/webapi/option/fatch-option-chain";
 
-  const response = await axios
-    .get(url, {
-      params: { symbol: symbol },
-    })
-    .catch(errorHandler);
+    const response = await axios
+      .get(url, {
+        params: { symbol: symbol },
+      })
+      .catch(errorHandler);
 
-  if (response) {
-    const opDatas = response.data.resultData.opDatas;
-    const spot = opDatas[0].index_close;
-    const strikes = [];
+    if (response) {
+      const opDatas = response.data.resultData.opDatas;
+      const spot = opDatas[0].index_close;
+      const strikes = [];
 
-    let strikeDiff = 1e9;
+      let strikeDiff = 1e9;
 
-    for (let i = 21; i < opDatas.length; i++) {
-      strikeDiff = Math.min(
-        strikeDiff,
-        Math.abs(opDatas[20].strike_price - opDatas[i].strike_price)
-      );
+      for (let i = 21; i < opDatas.length; i++) {
+        strikeDiff = Math.min(
+          strikeDiff,
+          Math.abs(opDatas[20].strike_price - opDatas[i].strike_price)
+        );
+      }
+
+      const atm = Math.ceil(spot / strikeDiff) * strikeDiff;
+      strikes.push(atm);
+      for (let i = 1; i <= 5; i++) {
+        strikes.push(atm - i * strikeDiff);
+        strikes.push(atm + i * strikeDiff);
+      }
+      strikes.sort();
+      res.send(strikes);
     }
+  } catch (error) {
+    errorHandler(error);
+    res.status(500).send("Internal Server Error");
+  }
+});
 
-    const atm = Math.ceil(spot / strikeDiff) * strikeDiff;
-    strikes.push(atm);
-    for (let i = 1; i <= 5; i++) {
-      strikes.push(atm - i * strikeDiff);
-      strikes.push(atm + i * strikeDiff);
-    }
-    strikes.sort();
-    res.send(strikes);
+app.post("/feedback", async (req, res) => {
+  try {
+    const Feedback = new mongoose.model("feedback", feedbackSchema);
+    await Feedback.create({
+      name: req.body.name,
+      email: req.body.email,
+      message: req.body.message,
+    }).catch(errorHandler);
+    res.status(201).json({ message: "Feedback saved successfully!" });
+  } catch (error) {
+    res.status(500).json({ error: "An error occurred while saving feedback." });
   }
 });
 
