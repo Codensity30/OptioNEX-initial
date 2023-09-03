@@ -4,7 +4,7 @@ const mongoose = require("mongoose");
 const axios = require("axios");
 const schedule = require("node-schedule");
 const cors = require("cors");
-const config = require("../config");
+const config = require("../src/config");
 const bodyParser = require("body-parser");
 
 //* function to handle error
