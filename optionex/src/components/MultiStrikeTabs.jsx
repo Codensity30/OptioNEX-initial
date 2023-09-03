@@ -23,7 +23,7 @@ function MultiStrikeTabs({ symbol, mode, expiryDate, currentExpiry }) {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:8000/strikes-list/${symbol}`
+          `https://optionxt-api.cyclic.app//strikes-list/${symbol}`
         );
         setStrikes(response.data);
         setIsDataFetched(true);

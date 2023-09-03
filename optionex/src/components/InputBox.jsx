@@ -11,7 +11,9 @@ export default function InputBox({ handleChange }) {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get(`http://localhost:8000/symbol-list`);
+        const response = await axios.get(
+          `https://optionxt-api.cyclic.app//symbol-list`
+        );
         const temp = response.data;
         temp.sort();
         setSymbols(temp);

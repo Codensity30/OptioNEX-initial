@@ -23,7 +23,7 @@ const OiCoiBarChart = ({ mode, symbol, expiryDate, oicoi }) => {
       try {
         setIsDataFetched(false);
         const response = await axios.get(
-          `http://localhost:8000/live-oicoi-ex/${symbol}/${expiryDate}`
+          `https://optionxt-api.cyclic.app//live-oicoi-ex/${symbol}/${expiryDate}`
         );
         setData(response.data);
         setIsDataFetched(true);

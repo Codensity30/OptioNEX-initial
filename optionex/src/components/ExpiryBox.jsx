@@ -22,7 +22,7 @@ export default function ExpiryBox({
     const fetchData = async () => {
       try {
         const response = await axios
-          .get(`http://localhost:8000/expiry-dates/${symbol}`)
+          .get(`https://optionxt-api.cyclic.app//expiry-dates/${symbol}`)
           .catch(errorHandler);
         const temp = response.data;
         const exp = temp.map((ele) => {

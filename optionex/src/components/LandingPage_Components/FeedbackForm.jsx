@@ -20,7 +20,7 @@ export default function FeedbackForm() {
   const handleSubmit = (event) => {
     event.preventDefault();
     axios
-      .post("http://localhost:8000/feedback", {
+      .post("https://optionxt-api.cyclic.app//feedback", {
         name: formData.name,
         email: formData.email,
         message: formData.message,

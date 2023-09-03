@@ -181,7 +181,9 @@ async function getAndStore(symbol) {
 }
 
 async function updateOi() {
-  await axios.get("http://localhost:8000/update-oiData").catch(errorHandler);
+  await axios
+    .get("https://optionxt-api.cyclic.app//update-oiData")
+    .catch(errorHandler);
 }
 
 async function clearDb() {
@@ -194,7 +196,9 @@ async function clearDb() {
 }
 
 async function storeSymbol() {
-  await axios.get("http://localhost:8000/symbol-store").catch(errorHandler);
+  await axios
+    .get("https://optionxt-api.cyclic.app//symbol-store")
+    .catch(errorHandler);
 }
 
 //* sheduling jobs to run at certain interval and time
@@ -249,6 +253,12 @@ app.get("/clear-db", async (req, res) => {
   res.send("db is cleared");
 });
 
+//* endpoint to test
+app.get("/", (req, res) => {
+  res.send("Hey this is my API running 🥳");
+});
+
+//! following are the endpoints for fetching data ---------------------------------------
 app.get("/symbol-list", async (req, res) => {
   try {
     const Symbol = mongoose.model("symbol_list", symbolListSchema);
@@ -472,6 +482,7 @@ app.get("/strikes-list/:symbol", async (req, res) => {
   }
 });
 
+//* endpoint to store the feedbacks in the db
 app.post("/feedback", async (req, res) => {
   try {
     const Feedback = new mongoose.model("feedback", feedbackSchema);

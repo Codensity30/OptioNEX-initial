@@ -33,7 +33,7 @@ export default function BasicTable({ mode, symbol }) {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:8000/total-coi/${symbol}`
+          `https://optionxt-api.cyclic.app//total-coi/${symbol}`
         );
         response.data.reverse();
         setData(response.data);

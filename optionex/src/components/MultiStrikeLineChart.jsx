@@ -22,7 +22,7 @@ const CoiLineChart = ({ mode, symbol, checkedStrikes }) => {
     const fetchDataForStrike = async (strike) => {
       try {
         const response = await axios.get(
-          `http://localhost:8000/sp-data/${symbol}/${strike}`
+          `https://optionxt-api.cyclic.app//sp-data/${symbol}/${strike}`
         );
         setStrikeData((prevData) => ({ ...prevData, [strike]: response.data }));
         setIsDataFetched(true);

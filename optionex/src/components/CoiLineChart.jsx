@@ -22,7 +22,7 @@ const CoiLineChart = ({ mode, symbol, type }) => {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:8000/total-coi/${symbol}`
+          `https://optionxt-api.cyclic.app//total-coi/${symbol}`
         );
         setData(response.data);
         setIsDataFetched(true);
