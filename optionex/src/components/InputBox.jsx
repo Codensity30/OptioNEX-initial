@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import config from "../../config";
 import axios from "axios";
 import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
@@ -11,9 +12,7 @@ export default function InputBox({ handleChange }) {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get(
-          `https://optionxt-api.cyclic.app//symbol-list`
-        );
+        const response = await axios.get(`${config.apiurl}/symbol-list`);
         const temp = response.data;
         temp.sort();
         setSymbols(temp);

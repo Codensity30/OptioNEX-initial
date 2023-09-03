@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import config from "../../config";
 import axios from "axios";
 import Loader from "./Loader";
 import {
@@ -23,7 +24,7 @@ const OiCoiBarChart = ({ mode, symbol, expiryDate, oicoi }) => {
       try {
         setIsDataFetched(false);
         const response = await axios.get(
-          `https://optionxt-api.cyclic.app//live-oicoi-ex/${symbol}/${expiryDate}`
+          `${config.apiurl}/live-oicoi-ex/${symbol}/${expiryDate}`
         );
         setData(response.data);
         setIsDataFetched(true);

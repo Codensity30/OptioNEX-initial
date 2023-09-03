@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import config from "../../config";
 import axios from "axios";
 import Loader from "./Loader";
 import {
@@ -22,7 +23,7 @@ const CoiLineChart = ({ mode, symbol, checkedStrikes }) => {
     const fetchDataForStrike = async (strike) => {
       try {
         const response = await axios.get(
-          `https://optionxt-api.cyclic.app//sp-data/${symbol}/${strike}`
+          `${config.apiurl}/sp-data/${symbol}/${strike}`
         );
         setStrikeData((prevData) => ({ ...prevData, [strike]: response.data }));
         setIsDataFetched(true);

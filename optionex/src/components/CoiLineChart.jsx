@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import config from "../../config";
 import axios from "axios";
 import Loader from "./Loader";
 import {
@@ -22,7 +23,7 @@ const CoiLineChart = ({ mode, symbol, type }) => {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          `https://optionxt-api.cyclic.app//total-coi/${symbol}`
+          `${config.apiurl}/total-coi/${symbol}`
         );
         setData(response.data);
         setIsDataFetched(true);

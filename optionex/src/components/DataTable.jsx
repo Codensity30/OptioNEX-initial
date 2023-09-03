@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import config from "../../config";
 import axios from "axios";
 import Paper from "@mui/material/Paper";
 import Table from "@mui/material/Table";
@@ -33,7 +34,7 @@ export default function BasicTable({ mode, symbol }) {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          `https://optionxt-api.cyclic.app//total-coi/${symbol}`
+          `${config.apiurl}/total-coi/${symbol}`
         );
         response.data.reverse();
         setData(response.data);

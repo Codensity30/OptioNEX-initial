@@ -1,4 +1,5 @@
 import { React, useEffect, useState } from "react";
+import config from "../../config";
 import axios from "axios";
 import Checkbox from "@mui/material/Checkbox";
 import FormControlLabel from "@mui/material/FormControlLabel";
@@ -23,7 +24,7 @@ function MultiStrikeTabs({ symbol, mode, expiryDate, currentExpiry }) {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          `https://optionxt-api.cyclic.app//strikes-list/${symbol}`
+          `${config.apiurl}/strikes-list/${symbol}`
         );
         setStrikes(response.data);
         setIsDataFetched(true);

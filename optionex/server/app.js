@@ -4,7 +4,7 @@ const mongoose = require("mongoose");
 const axios = require("axios");
 const schedule = require("node-schedule");
 const cors = require("cors");
-const config = require("./config");
+const config = require("../config");
 const bodyParser = require("body-parser");
 
 //* function to handle error
@@ -181,9 +181,7 @@ async function getAndStore(symbol) {
 }
 
 async function updateOi() {
-  await axios
-    .get("https://optionxt-api.cyclic.app//update-oiData")
-    .catch(errorHandler);
+  await axios.get(`${config.apiurl}/update-oiData`).catch(errorHandler);
 }
 
 async function clearDb() {
@@ -196,9 +194,7 @@ async function clearDb() {
 }
 
 async function storeSymbol() {
-  await axios
-    .get("https://optionxt-api.cyclic.app//symbol-store")
-    .catch(errorHandler);
+  await axios.get(`${config.apiurl}/symbol-store`).catch(errorHandler);
 }
 
 //* sheduling jobs to run at certain interval and time
