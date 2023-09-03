@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import config from "../config";
 import axios from "axios";
 import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";

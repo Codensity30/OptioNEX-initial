@@ -1,5 +1,4 @@
 import { React, useEffect, useState } from "react";
-import config from "../config";
 import axios from "axios";
 import Checkbox from "@mui/material/Checkbox";
 import FormControlLabel from "@mui/material/FormControlLabel";
