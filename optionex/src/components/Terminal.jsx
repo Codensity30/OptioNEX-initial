@@ -46,7 +46,11 @@ function Terminal() {
     <ThemeProvider theme={Theme}>
       <CssBaseline />
       <div style={{ width: "100%", height: "100%", paddingBottom: "50px" }}>
-        <Header mode={mode} handleModeChange={handleModeChange} />
+        <Header
+          mode={mode}
+          handleModeChange={handleModeChange}
+          objective={"terminal"}
+        />
         <InputBar
           symbol={symbol}
           handleExpiryChange={handleExpiryChange}

@@ -10,7 +10,7 @@ import Header from "./Header";
 function LandingPage() {
   return (
     <>
-      <Header />
+      <Header mode={"light"} objective={"landing"} />
       <HeroSection />
       <ComparisonSection />
       <FeatureSection />
