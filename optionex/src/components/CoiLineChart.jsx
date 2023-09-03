@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import config from "../config";
 import axios from "axios";
 import Loader from "./Loader";
 import {
@@ -23,7 +22,7 @@ const CoiLineChart = ({ mode, symbol, type }) => {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          `${config.apiurl}/total-coi/${symbol}`
+          `${process.env.REACT_APP_Api_URL}/total-coi/${symbol}`
         );
         setData(response.data);
         setIsDataFetched(true);

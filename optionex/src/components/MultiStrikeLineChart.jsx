@@ -23,7 +23,7 @@ const CoiLineChart = ({ mode, symbol, checkedStrikes }) => {
     const fetchDataForStrike = async (strike) => {
       try {
         const response = await axios.get(
-          `${config.apiurl}/sp-data/${symbol}/${strike}`
+          `${process.env.REACT_APP_Api_URL}/sp-data/${symbol}/${strike}`
         );
         setStrikeData((prevData) => ({ ...prevData, [strike]: response.data }));
         setIsDataFetched(true);

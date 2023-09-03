@@ -23,7 +23,7 @@ export default function ExpiryBox({
     const fetchData = async () => {
       try {
         const response = await axios
-          .get(`${config.apiurl}/expiry-dates/${symbol}`)
+          .get(`${process.env.REACT_APP_Api_URL}/expiry-dates/${symbol}`)
           .catch(errorHandler);
         const temp = response.data;
         const exp = temp.map((ele) => {

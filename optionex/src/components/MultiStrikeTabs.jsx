@@ -24,7 +24,7 @@ function MultiStrikeTabs({ symbol, mode, expiryDate, currentExpiry }) {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          `${config.apiurl}/strikes-list/${symbol}`
+          `${process.env.REACT_APP_Api_URL}/strikes-list/${symbol}`
         );
         setStrikes(response.data);
         setIsDataFetched(true);

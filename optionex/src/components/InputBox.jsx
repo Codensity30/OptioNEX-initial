@@ -12,7 +12,9 @@ export default function InputBox({ handleChange }) {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get(`${config.apiurl}/symbol-list`);
+        const response = await axios.get(
+          `${process.env.REACT_APP_Api_URL}/symbol-list`
+        );
         const temp = response.data;
         temp.sort();
         setSymbols(temp);

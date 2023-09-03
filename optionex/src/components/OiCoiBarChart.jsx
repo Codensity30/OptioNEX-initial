@@ -24,7 +24,7 @@ const OiCoiBarChart = ({ mode, symbol, expiryDate, oicoi }) => {
       try {
         setIsDataFetched(false);
         const response = await axios.get(
-          `${config.apiurl}/live-oicoi-ex/${symbol}/${expiryDate}`
+          `${process.env.REACT_APP_Api_URL}/live-oicoi-ex/${symbol}/${expiryDate}`
         );
         setData(response.data);
         setIsDataFetched(true);

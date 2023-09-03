@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import config from "../config";
 import axios from "axios";
 import Paper from "@mui/material/Paper";
 import Table from "@mui/material/Table";
@@ -34,7 +33,7 @@ export default function BasicTable({ mode, symbol }) {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          `${config.apiurl}/total-coi/${symbol}`
+          `${process.env.REACT_APP_Api_URL}/total-coi/${symbol}`
         );
         response.data.reverse();
         setData(response.data);

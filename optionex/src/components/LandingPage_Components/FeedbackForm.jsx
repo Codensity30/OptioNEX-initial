@@ -20,7 +20,7 @@ export default function FeedbackForm() {
   const handleSubmit = (event) => {
     event.preventDefault();
     axios
-      .post("${config.apiurl}/feedback", {
+      .post("${process.env.REACT_APP_Api_URL}/feedback", {
         name: formData.name,
         email: formData.email,
         message: formData.message,
