@@ -32,10 +32,10 @@ const OiCoiBarChart = ({ mode, symbol, expiryDate, oicoi }) => {
       }
     };
     fetchData();
-    // const intervalId = setInterval(fetchData, 60000);
-    // return () => {
-    //   clearInterval(intervalId);
-    // };
+    const intervalId = setInterval(fetchData, 60000);
+    return () => {
+      clearInterval(intervalId);
+    };
   }, [symbol, expiryDate]);
 
   const fill = mode === "light" ? "#8c8c8c" : "#d9d9d9";

@@ -59,7 +59,6 @@ const CustomTabs = ({ mode, symbol, expiryDate, currentExpiry }) => {
           p: 3,
           height: "90%",
           minHeight: "450px",
-          // overflow: "auto",
         }}
       >
         {selectedTab === 0 && (

@@ -31,10 +31,10 @@ const CoiLineChart = ({ mode, symbol, type }) => {
       }
     };
     fetchData();
-    // const intervalId = setInterval(fetchData, 60000);
-    // return () => {
-    //   clearInterval(intervalId);
-    // };
+    const intervalId = setInterval(fetchData, 60000);
+    return () => {
+      clearInterval(intervalId);
+    };
   }, [symbol]);
 
   const fill = mode === "light" ? "#8c8c8c" : "#d9d9d9";

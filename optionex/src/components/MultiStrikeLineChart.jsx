@@ -33,13 +33,13 @@ const CoiLineChart = ({ mode, symbol, checkedStrikes }) => {
 
     checkedStrikes.forEach((strike) => fetchDataForStrike(strike));
 
-    // const intervalId = setInterval(() => {
-    //   checkedStrikes.forEach((strike) => fetchDataForStrike(strike));
-    // }, 60000);
+    const intervalId = setInterval(() => {
+      checkedStrikes.forEach((strike) => fetchDataForStrike(strike));
+    }, 60000);
 
-    // return () => {
-    //   clearInterval(intervalId);
-    // };
+    return () => {
+      clearInterval(intervalId);
+    };
   }, [symbol, checkedStrikes]);
 
   const fill = mode === "light" ? "#8c8c8c" : "#d9d9d9";

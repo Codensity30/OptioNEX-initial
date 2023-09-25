@@ -42,10 +42,10 @@ export default function BasicTable({ mode, symbol }) {
       }
     };
     fetchData();
-    // const intervalId = setInterval(fetchData, 60000);
-    // return () => {
-    //   clearInterval(intervalId);
-    // };
+    const intervalId = setInterval(fetchData, 60000);
+    return () => {
+      clearInterval(intervalId);
+    };
   }, [symbol]);
 
   return (
