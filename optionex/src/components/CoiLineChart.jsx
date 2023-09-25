@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { DateTime } from "luxon";
 import Loader from "./Loader";
 import {
   LineChart,
@@ -19,6 +20,7 @@ const CoiLineChart = ({ mode, symbol, type }) => {
   const [isDataFetched, setIsDataFetched] = useState(false);
 
   useEffect(() => {
+    let intervalId; // Store the interval ID
     const fetchData = async () => {
       try {
         const response = await axios.get(
@@ -30,10 +32,30 @@ const CoiLineChart = ({ mode, symbol, type }) => {
         console.error("Error fetching data: ", error);
       }
     };
-    fetchData();
-    const intervalId = setInterval(fetchData, 60000);
+    fetchData(); // immediately call when the component is mounted
+
+    const scheduleNextCall = () => {
+      const now = DateTime.now().setZone("Asia/Kolkata");
+      const minutes = now.minute;
+
+      // Calculate the delay until the next minute immediately following one divisible by 5
+      const nextMinuteDivisibleBy5 = (Math.floor(minutes / 5) + 1) * 5;
+      const delay = (nextMinuteDivisibleBy5 - minutes) * 60000;
+
+      // Schedule the next call after the calculated delay
+      intervalId = setTimeout(() => {
+        fetchData();
+        // After the call, schedule the next one
+        scheduleNextCall();
+      }, delay + 20000); // Add 0.5 minute to the delay to call at the next minute
+    };
+
+    // Schedule the initial call
+    scheduleNextCall();
+
+    // Clear the interval when the component unmounts
     return () => {
-      clearInterval(intervalId);
+      clearTimeout(intervalId);
     };
   }, [symbol]);
 

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { DateTime } from "luxon";
 import Loader from "./Loader";
 import {
   LineChart,
@@ -18,7 +19,31 @@ const CoiLineChart = ({ mode, symbol, checkedStrikes }) => {
   const [strikeData, setStrikeData] = useState({});
   const [isDataFetched, setIsDataFetched] = useState(false);
 
+  // useEffect(() => {
+  //   const fetchDataForStrike = async (strike) => {
+  //     try {
+  //       const response = await axios.get(
+  //         `${process.env.REACT_APP_Api_URL}/sp-data/${symbol}/${strike}`
+  //       );
+  //       setStrikeData((prevData) => ({ ...prevData, [strike]: response.data }));
+  //       setIsDataFetched(true);
+  //     } catch (error) {
+  //       console.error(`Error fetching data for ${strike}:`, error);
+  //     }
+  //   };
+
+  //   checkedStrikes.forEach((strike) => fetchDataForStrike(strike));
+
+  //   const intervalId = setInterval(() => {
+  //     checkedStrikes.forEach((strike) => fetchDataForStrike(strike));
+  //   }, 60000);
+
+  //   return () => {
+  //     clearInterval(intervalId);
+  //   };
+  // }, [symbol, checkedStrikes]);
   useEffect(() => {
+    let intervalId;
     const fetchDataForStrike = async (strike) => {
       try {
         const response = await axios.get(
@@ -31,14 +56,31 @@ const CoiLineChart = ({ mode, symbol, checkedStrikes }) => {
       }
     };
 
+    const scheduleNextCall = () => {
+      const now = DateTime.now().setZone("Asia/Kolkata");
+      const minutes = now.minute;
+
+      // Calculate the delay until the next minute immediately following one divisible by 5
+      const nextMinuteDivisibleBy5 = (Math.floor(minutes / 5) + 1) * 5;
+      const delay = (nextMinuteDivisibleBy5 - minutes) * 60000;
+
+      // Schedule the next call after the calculated delay
+      intervalId = setTimeout(() => {
+        checkedStrikes.forEach((strike) => fetchDataForStrike(strike));
+        // After the call, schedule the next one
+        scheduleNextCall();
+      }, delay + 20000); // Add 1 minute to the delay to call at the next minute
+    };
+
+    // Call fetchDataForStrike for each checked strike when the component is mounted
     checkedStrikes.forEach((strike) => fetchDataForStrike(strike));
 
-    const intervalId = setInterval(() => {
-      checkedStrikes.forEach((strike) => fetchDataForStrike(strike));
-    }, 60000);
+    // Schedule the initial call
+    scheduleNextCall();
 
+    // Clear the timeout when the component unmounts
     return () => {
-      clearInterval(intervalId);
+      clearTimeout(intervalId);
     };
   }, [symbol, checkedStrikes]);
 

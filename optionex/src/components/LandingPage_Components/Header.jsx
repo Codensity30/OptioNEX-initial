@@ -4,9 +4,8 @@ import {
   DarkModeOutlined,
   LightModeOutlined,
   AutoStoriesOutlined,
-  RateReviewOutlined,
+  BugReportOutlined,
 } from "@mui/icons-material";
-import FeedbackForm from "./FeedbackForm";
 
 function Header({ handleModeChange, mode, objective }) {
   return (
@@ -94,15 +93,15 @@ function Header({ handleModeChange, mode, objective }) {
                 mode === "light" ? "" : "shadow-gray-500"
               }`}
             >
-              <Tooltip title="We'd love to hear your feedback!">
+              <Tooltip title="Help us squash pesky bugs!">
                 <IconButton
                   aria-label="mode"
                   onClick={() => {
-                    alert("Google form for feedback will be avaiable soon!");
+                    alert("Bug report form would be available soon!");
                   }}
                   sx={{ color: "#0ea5e9" }}
                 >
-                  <RateReviewOutlined fontSize="small" />
+                  <BugReportOutlined fontSize="small" />
                 </IconButton>
               </Tooltip>
             </div>

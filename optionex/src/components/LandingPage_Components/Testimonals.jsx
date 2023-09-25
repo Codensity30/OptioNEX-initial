@@ -1,7 +1,9 @@
-import React from "react";
+import { useState } from "react";
 import FeedbackForm from "./FeedbackForm";
 
 function Testimonals() {
+  const [showModal, setShowModal] = useState(false);
+
   return (
     <>
       <section id="testimonies" className="py-20 bg-slate-900">
@@ -200,7 +202,13 @@ function Testimonals() {
               </li>
             </ul>
           </div>
-          <FeedbackForm />
+          <button
+            className="font-Poppins text-sm bg-gradient-to-tr from-purple-600 to-pink-600 text-white p-3 rounded-md block mx-auto mt-10 hover:shadow-lg hover:shadow-purple-900 before:ease-linear transition-all duration-150"
+            onClick={() => setShowModal(true)}
+          >
+            Got something to say?
+          </button>
+          {showModal && <FeedbackForm setShowModal={setShowModal} />}
           <p className="text-sm text-slate-400 text-center mt-3 ">
             Don't hold back! Speak up and let your voice be heard 👍
           </p>

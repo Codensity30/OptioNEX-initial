@@ -1,7 +1,7 @@
 /*LOADER BOX*/
 .loader {
-  height: 150px;
-  width: 200px;
+  /* height: 150px; */
+  /* width: 200px; */
   display: inline-flex;
   align-items: center;
   justify-content: center;
