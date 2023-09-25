@@ -19,6 +19,7 @@ function InputBar({
         alignItems: "center",
         p: 3,
         gap: 7,
+        minHeight: "80px",
         height: "10%",
         marginTop: "80px",
       }}

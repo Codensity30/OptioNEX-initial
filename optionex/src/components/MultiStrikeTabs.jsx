@@ -107,7 +107,7 @@ function MultiStrikeTabs({ symbol, mode, expiryDate, currentExpiry }) {
 
   return (
     <>
-      <div style={{ display: "flex", justifyContent: "center" }}>
+      <div className="flex lg:justify-center items-center overflow-x-auto no-scrollbar">
         {strikes.map((strike, index) => (
           <FormControlLabel
             control={

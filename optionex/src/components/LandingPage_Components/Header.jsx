@@ -6,11 +6,12 @@ import {
   AutoStoriesOutlined,
   RateReviewOutlined,
 } from "@mui/icons-material";
+import FeedbackForm from "./FeedbackForm";
 
 function Header({ handleModeChange, mode, objective }) {
   return (
     <div
-      className={`fixed left-0 right-0 top-0 py-1 md:py-3 backdrop-blur ${
+      className={`fixed left-0 right-0 top-0 py-2 pl-3 md:py-3 backdrop-blur ${
         mode === "light" ? "bg-white/30" : "bg-black/30"
       } z-50`}
     >
@@ -19,12 +20,7 @@ function Header({ handleModeChange, mode, objective }) {
           objective === "landing" ? "justify-center" : "justify-between"
         }  items-center px-4`}
       >
-        {objective === "terminal" && <div></div>}
-        <div
-          className={`flex items-center gap-1 ${
-            objective === "terminal" ? "ml-32" : ""
-          }`}
-        >
+        <div className={"flex items-center gap-1"}>
           <div className="w-7 h-7">
             <img
               src={require("../../images/optionex_logo.png")}
@@ -48,7 +44,7 @@ function Header({ handleModeChange, mode, objective }) {
             <div
               className={`border ${
                 mode === "light" ? "border-slate-200" : "border-slate-500"
-              } rounded-xl w-9 h-9 flex justify-center items-center shadow-sm ${
+              } rounded-lg md:rounded-xl w-7 h-7 md:w-9 md:h-9 flex justify-center items-center shadow-sm ${
                 mode === "light" ? "" : "shadow-gray-500"
               }`}
             >
@@ -75,14 +71,16 @@ function Header({ handleModeChange, mode, objective }) {
             <div
               className={`border ${
                 mode === "light" ? "border-slate-200" : "border-slate-500"
-              } rounded-xl w-9 h-9 flex justify-center items-center shadow-sm ${
+              } rounded-lg md:rounded-xl  w-7 h-7 md:w-9 md:h-9 flex justify-center items-center shadow-sm ${
                 mode === "light" ? "" : "shadow-gray-500"
               }`}
             >
               <Tooltip title="Check out the tutorial, it's super helpful!">
                 <IconButton
                   aria-label="mode"
-                  onClick={handleModeChange}
+                  onClick={() => {
+                    alert("Hang tight! we'll get you there soon");
+                  }}
                   sx={{ color: "#0ea5e9" }}
                 >
                   <AutoStoriesOutlined fontSize="small" />
@@ -92,14 +90,16 @@ function Header({ handleModeChange, mode, objective }) {
             <div
               className={`border ${
                 mode === "light" ? "border-slate-200" : "border-slate-500"
-              } rounded-xl w-9 h-9 flex justify-center items-center shadow-sm ${
+              } rounded-lg md:rounded-xl  w-7 h-7 md:w-9 md:h-9 flex justify-center items-center shadow-sm ${
                 mode === "light" ? "" : "shadow-gray-500"
               }`}
             >
               <Tooltip title="We'd love to hear your feedback!">
                 <IconButton
                   aria-label="mode"
-                  onClick={handleModeChange}
+                  onClick={() => {
+                    alert("Google form for feedback will be avaiable soon!");
+                  }}
                   sx={{ color: "#0ea5e9" }}
                 >
                   <RateReviewOutlined fontSize="small" />

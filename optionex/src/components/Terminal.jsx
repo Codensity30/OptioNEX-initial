@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
+import useResponsiveFontSize from "./useResponsiveFontSize";
 import CssBaseline from "@mui/material/CssBaseline";
 import CustomTabs from "./CustomTabs";
 import InputBar from "./InputBar";
@@ -33,17 +34,20 @@ function Terminal() {
     else setMode("light");
   }
 
-  const Theme = createTheme({
+  const theme = createTheme({
     palette: {
       mode: mode,
       background: {
         default: mode === "light" ? "#efefef" : "#565656",
       },
     },
+    typography: {
+      fontSize: useResponsiveFontSize(),
+    },
   });
 
   return (
-    <ThemeProvider theme={Theme}>
+    <ThemeProvider theme={theme}>
       <CssBaseline />
       <div style={{ width: "100%", height: "100%", paddingBottom: "50px" }}>
         <Header

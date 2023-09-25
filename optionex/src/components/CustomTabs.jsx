@@ -26,26 +26,42 @@ const CustomTabs = ({ mode, symbol, expiryDate, currentExpiry }) => {
         margin: "auto",
         marginY: "30px",
         height: "95%",
+        minHeight: "600px",
       }}
     >
-      <Tabs value={selectedTab} onChange={handleTabChange} centered>
-        <Tab
-          label="Open Interest"
-          icon={<InsertChartOutlinedRounded />}
-          iconPosition="start"
-        />
-        <Tab
-          label="Buildup vs Time"
-          icon={<QueryStatsRounded />}
-          iconPosition="start"
-        />
-        <Tab
-          label="Multistrike COI"
-          icon={<StackedLineChartRounded />}
-          iconPosition="start"
-        />
-      </Tabs>
-      <Box sx={{ p: 3, height: "90%" }}>
+      <Box display="flex" justifyContent="center" width="100%">
+        <Tabs
+          value={selectedTab}
+          onChange={handleTabChange}
+          variant="scrollable"
+          scrollButtons
+          allowScrollButtonsMobile
+        >
+          <Tab
+            label="Open Interest"
+            icon={<InsertChartOutlinedRounded />}
+            iconPosition="start"
+          />
+          <Tab
+            label="Buildup vs Time"
+            icon={<QueryStatsRounded />}
+            iconPosition="start"
+          />
+          <Tab
+            label="Multistrike COI"
+            icon={<StackedLineChartRounded />}
+            iconPosition="start"
+          />
+        </Tabs>
+      </Box>
+      <Box
+        sx={{
+          p: 3,
+          height: "90%",
+          minHeight: "450px",
+          // overflow: "auto",
+        }}
+      >
         {selectedTab === 0 && (
           <OpenInterestTabs
             symbol={symbol}
