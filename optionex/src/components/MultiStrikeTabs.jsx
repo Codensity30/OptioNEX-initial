@@ -90,7 +90,7 @@ function MultiStrikeTabs({ symbol, mode, expiryDate, currentExpiry }) {
             color: "grey",
           }}
         >
-          Try searching for NIFTY, BANKNIFTY, FINIFTY, MIDCPNIFTY or switch to
+          Till then, Try searching for NIFTY, BANKNIFTY, FINIFTY or switch to
           Current Expiry
         </div>
       </>
