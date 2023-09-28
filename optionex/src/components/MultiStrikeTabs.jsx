@@ -112,12 +112,13 @@ function MultiStrikeTabs({ symbol, mode, expiryDate, currentExpiry }) {
           <FormControlLabel
             control={
               <Checkbox
-                key={index}
+                name={toString(index)}
                 color="secondary"
                 checked={checkedStrikes.includes(strike)}
                 onChange={() => handleCheckboxChange(strike)}
               />
             }
+            key={index}
             label={strike}
           />
         ))}

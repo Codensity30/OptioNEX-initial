@@ -19,29 +19,6 @@ const CoiLineChart = ({ mode, symbol, checkedStrikes }) => {
   const [strikeData, setStrikeData] = useState({});
   const [isDataFetched, setIsDataFetched] = useState(false);
 
-  // useEffect(() => {
-  //   const fetchDataForStrike = async (strike) => {
-  //     try {
-  //       const response = await axios.get(
-  //         `${process.env.REACT_APP_Api_URL}/sp-data/${symbol}/${strike}`
-  //       );
-  //       setStrikeData((prevData) => ({ ...prevData, [strike]: response.data }));
-  //       setIsDataFetched(true);
-  //     } catch (error) {
-  //       console.error(`Error fetching data for ${strike}:`, error);
-  //     }
-  //   };
-
-  //   checkedStrikes.forEach((strike) => fetchDataForStrike(strike));
-
-  //   const intervalId = setInterval(() => {
-  //     checkedStrikes.forEach((strike) => fetchDataForStrike(strike));
-  //   }, 60000);
-
-  //   return () => {
-  //     clearInterval(intervalId);
-  //   };
-  // }, [symbol, checkedStrikes]);
   useEffect(() => {
     let intervalId;
     const fetchDataForStrike = async (strike) => {

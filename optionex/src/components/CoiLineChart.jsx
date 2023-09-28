@@ -20,44 +20,68 @@ const CoiLineChart = ({ mode, symbol, type }) => {
   const [isDataFetched, setIsDataFetched] = useState(false);
 
   useEffect(() => {
-    let intervalId; // Store the interval ID
     const fetchData = async () => {
       try {
-        const response = await axios.get(
-          `${process.env.REACT_APP_Api_URL}/total-coi/${symbol}`
-        );
-        setData(response.data);
+        let storedData = sessionStorage.getItem(symbol); // Attempt to get data from local storage
+        let parsedData = storedData ? JSON.parse(storedData) : null;
+        // Check if data is in local storage and meets the conditions for freshness
+        if (
+          parsedData &&
+          parsedData.length > 0 &&
+          isDataFresh(parsedData[0]) // Check the freshness of the first data element
+        ) {
+          // Data is in local storage and fresh, use it
+          parsedData.reverse();
+          setData(parsedData);
+        } else {
+          // Data is not in local storage or not fresh, fetch from API
+          const response = await axios.get(
+            `${process.env.REACT_APP_Api_URL}/total-coi/${symbol}`
+          );
+          setData(response.data);
+          response.data.reverse();
+          sessionStorage.setItem(symbol, JSON.stringify(response.data));
+        }
         setIsDataFetched(true);
       } catch (error) {
         console.error("Error fetching data: ", error);
       }
     };
+
     fetchData(); // immediately call when the component is mounted
-
-    const scheduleNextCall = () => {
-      const now = DateTime.now().setZone("Asia/Kolkata");
-      const minutes = now.minute;
-
-      // Calculate the delay until the next minute immediately following one divisible by 5
-      const nextMinuteDivisibleBy5 = (Math.floor(minutes / 5) + 1) * 5;
-      const delay = (nextMinuteDivisibleBy5 - minutes) * 60000;
-
-      // Schedule the next call after the calculated delay
-      intervalId = setTimeout(() => {
-        fetchData();
-        // After the call, schedule the next one
-        scheduleNextCall();
-      }, delay + 20000); // Add 0.5 minute to the delay to call at the next minute
-    };
-
-    // Schedule the initial call
-    scheduleNextCall();
+    const intervalId = setInterval(fetchData, 60000); // Fetch data every minute
 
     // Clear the interval when the component unmounts
     return () => {
-      clearTimeout(intervalId);
+      clearInterval(intervalId);
     };
   }, [symbol]);
+
+  // Define a function to check if the data is fresh based on conditions
+  function isDataFresh(data) {
+    if (!data || !data.time) {
+      // If there's no "time" property in the data, consider it not fresh
+      return false;
+    }
+
+    // Convert the "time" string to a Luxon DateTime object in the "Asia/Kolkata" time zone
+    const dataTime = DateTime.fromFormat(data.time, "HH:mm", {
+      zone: "Asia/Kolkata",
+    });
+    // Get the current time in the "Asia/Kolkata" time zone
+    const currentTime = DateTime.now().setZone("Asia/Kolkata");
+
+    // Check if the data is fresh based on conditions
+    return (
+      (dataTime.hour === 15 && dataTime.minute === 30) ||
+      isWithinFiveMinutes(currentTime, dataTime)
+    );
+  }
+
+  function isWithinFiveMinutes(currentTime, dataTime) {
+    const timeDifference = currentTime.diff(dataTime, "minutes").minutes;
+    return Math.abs(timeDifference) < 5;
+  }
 
   const fill = mode === "light" ? "#8c8c8c" : "#d9d9d9";
   const toolbg =

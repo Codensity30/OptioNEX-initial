@@ -1,6 +1,6 @@
 function Loader() {
   return (
-    <div class="loader loader11">
+    <div className="loader loader11">
       <svg width="52px" height="24px" viewBox="0 0 52 24" fill="#33a3e3">
         <rect x="0" y="0" width="4" height="100%" />
         <rect x="8" y="0" width="4" height="100%" />

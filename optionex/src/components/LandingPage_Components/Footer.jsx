@@ -38,7 +38,7 @@ function Footer() {
                 </button>
               </div>
             </div>
-            <div class="w-full lg:w-6/12 px-4">
+            <div className="w-full lg:w-6/12 px-4">
               <div className="flex gap-2 items-center">
                 <div className="w-10 h-10">
                   <img

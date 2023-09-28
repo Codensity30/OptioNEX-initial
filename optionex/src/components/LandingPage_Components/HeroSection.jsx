@@ -19,11 +19,11 @@ export default function Example() {
           />
         </div>
         <div className="mx-auto max-w-2xl py-32 sm:py-32 lg:py-40">
-          <div class="w-40 mx-auto mb-5">
-            <div class="relative group">
-              <div class="absolute -inset-1 bg-gradient-to-r from-cyan-500 to-violet-500 rounded-lg blur opacity-25 group-hover:opacity-100 transition duration-1000 group-hover:duration-200"></div>
-              <div class="relative px-1 bg-opacity-80 bg-white ring-1 ring-gray-900/5 rounded-2xl ">
-                <p class="text-slate-700 gap-1 flex justify-center items-center">
+          <div className="w-40 mx-auto mb-5">
+            <div className="relative group">
+              <div className="absolute -inset-1 bg-gradient-to-r from-cyan-500 to-violet-500 rounded-lg blur opacity-25 group-hover:opacity-100 transition duration-1000 group-hover:duration-200"></div>
+              <div className="relative px-1 bg-opacity-80 bg-white ring-1 ring-gray-900/5 rounded-2xl ">
+                <p className="text-slate-700 gap-1 flex justify-center items-center">
                   Be your
                   <span className="bg-clip-text text-transparent bg-gradient-to-br from-sky-500 to-teal-500">
                     NXT
