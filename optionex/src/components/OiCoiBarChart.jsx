@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { DateTime } from "luxon";
 import axios from "axios";
 import Loader from "./Loader";
 import {
@@ -19,6 +20,7 @@ const OiCoiBarChart = ({ mode, symbol, expiryDate, oicoi }) => {
   const [isDataFetched, setIsDataFetched] = useState(false);
 
   useEffect(() => {
+    let intervalId;
     const fetchData = async () => {
       try {
         setIsDataFetched(false);
@@ -27,15 +29,30 @@ const OiCoiBarChart = ({ mode, symbol, expiryDate, oicoi }) => {
         );
         setData(response.data);
         setIsDataFetched(true);
+        const currentTime = DateTime.now().setZone("Asia/Kolkata");
+        if (!isWithinTradingTime(currentTime)) {
+          clearInterval(intervalId);
+        }
       } catch (error) {
         console.error("Error fetching data: ", error);
       }
     };
     fetchData();
-    const intervalId = setInterval(fetchData, 60000);
+    intervalId = setInterval(fetchData, 60000);
     return () => {
       clearInterval(intervalId);
     };
+
+    // to check whether trading is open or not
+    function isWithinTradingTime(currentTime) {
+      return (
+        !(currentTime.weekday === 6 || currentTime.weekday === 7) &&
+        currentTime.hour >= 9 &&
+        currentTime.minute >= 15 &&
+        (currentTime.hour < 15 ||
+          (currentTime.hour === 15 && currentTime.minute <= 30))
+      );
+    }
   }, [symbol, expiryDate]);
 
   const fill = mode === "light" ? "#8c8c8c" : "#d9d9d9";

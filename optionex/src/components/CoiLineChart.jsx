@@ -17,11 +17,13 @@ import {
 
 const CoiLineChart = ({ mode, symbol, type }) => {
   const [data, setData] = useState([]);
+  const [early, setEarly] = useState(false);
   const [isDataFetched, setIsDataFetched] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
+        setIsDataFetched(false);
         let storedData = sessionStorage.getItem(symbol); // Attempt to get data from local storage
         let parsedData = storedData ? JSON.parse(storedData) : null;
         // Check if data is in local storage and meets the conditions for freshness
@@ -38,9 +40,15 @@ const CoiLineChart = ({ mode, symbol, type }) => {
           const response = await axios.get(
             `${process.env.REACT_APP_Api_URL}/total-coi/${symbol}`
           );
+          if (response.data && response.data === "Wait for market opening") {
+            setIsDataFetched(true);
+            setEarly(true);
+            return;
+          }
           setData(response.data);
-          response.data.reverse();
-          sessionStorage.setItem(symbol, JSON.stringify(response.data));
+          const reversedData = [...response.data];
+          reversedData.reverse();
+          sessionStorage.setItem(symbol, JSON.stringify(reversedData));
         }
         setIsDataFetched(true);
       } catch (error) {
@@ -55,33 +63,40 @@ const CoiLineChart = ({ mode, symbol, type }) => {
     return () => {
       clearInterval(intervalId);
     };
-  }, [symbol]);
 
-  // Define a function to check if the data is fresh based on conditions
-  function isDataFresh(data) {
-    if (!data || !data.time) {
-      // If there's no "time" property in the data, consider it not fresh
-      return false;
+    // to check whether trading is open or not
+    function isWithinTradingTime(currentTime) {
+      return (
+        !(currentTime.weekday === 6 || currentTime.weekday === 7) &&
+        currentTime.hour >= 9 &&
+        currentTime.minute >= 15 &&
+        (currentTime.hour < 15 ||
+          (currentTime.hour === 15 && currentTime.minute <= 30))
+      );
     }
 
-    // Convert the "time" string to a Luxon DateTime object in the "Asia/Kolkata" time zone
-    const dataTime = DateTime.fromFormat(data.time, "HH:mm", {
-      zone: "Asia/Kolkata",
-    });
-    // Get the current time in the "Asia/Kolkata" time zone
-    const currentTime = DateTime.now().setZone("Asia/Kolkata");
+    function isWithinFiveMinutes(currentTime, dataTime) {
+      const timeDifference = currentTime.diff(dataTime, "minutes").minutes;
+      return Math.abs(timeDifference) < 5;
+    }
 
-    // Check if the data is fresh based on conditions
-    return (
-      (dataTime.hour === 15 && dataTime.minute === 30) ||
-      isWithinFiveMinutes(currentTime, dataTime)
-    );
-  }
-
-  function isWithinFiveMinutes(currentTime, dataTime) {
-    const timeDifference = currentTime.diff(dataTime, "minutes").minutes;
-    return Math.abs(timeDifference) < 5;
-  }
+    // to check the data freshness
+    function isDataFresh(data) {
+      if (!data || !data.time) {
+        return false;
+      }
+      const dataTime = DateTime.fromFormat(data.time, "HH:mm", {
+        zone: "Asia/Kolkata",
+      });
+      const currentTime = DateTime.now().setZone("Asia/Kolkata");
+      return (
+        (!isWithinTradingTime(currentTime) &&
+          dataTime.hour === 15 &&
+          dataTime.minute === 30) ||
+        isWithinFiveMinutes(currentTime, dataTime)
+      );
+    }
+  }, [symbol]);
 
   const fill = mode === "light" ? "#8c8c8c" : "#d9d9d9";
   const toolbg =
@@ -100,6 +115,36 @@ const CoiLineChart = ({ mode, symbol, type }) => {
     return (
       <div style={{ display: "flex", alignItems: "center", height: "500px" }}>
         <Loader />
+      </div>
+    );
+  }
+
+  if (early) {
+    return (
+      <div style={{ height: "95%", marginTop: "5%" }}>
+        <div style={{ height: "80%" }}>
+          <img
+            src={require(`../images/early_${mode}.png`)}
+            alt=""
+            style={{
+              height: "100%",
+              width: "100%",
+              margin: "auto",
+              objectFit: "contain",
+              opacity: 0.7,
+            }}
+          />
+        </div>
+        <div
+          style={{
+            textAlign: "center",
+            fontFamily: "Comic Sans MS, 'Arial Rounded MT Bold', sans-serif",
+            color: "gray",
+          }}
+        >
+          Just hold on! Our OI buildup data starts pouring in just 5 minutes
+          after the opening bell rings.
+        </div>
       </div>
     );
   }

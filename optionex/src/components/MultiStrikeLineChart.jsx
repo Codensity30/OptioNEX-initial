@@ -17,7 +17,12 @@ import {
 
 const CoiLineChart = ({ mode, symbol, checkedStrikes }) => {
   const [strikeData, setStrikeData] = useState({});
+  const [early, setEarly] = useState(false);
   const [isDataFetched, setIsDataFetched] = useState(false);
+
+  useEffect(() => {
+    setIsDataFetched(true);
+  }, [symbol]);
 
   useEffect(() => {
     let intervalId;
@@ -26,11 +31,16 @@ const CoiLineChart = ({ mode, symbol, checkedStrikes }) => {
         const response = await axios.get(
           `${process.env.REACT_APP_Api_URL}/sp-data/${symbol}/${strike}`
         );
+        if (response.data && response.data === "Wait for market opening") {
+          setIsDataFetched(true);
+          setEarly(true);
+          return;
+        }
         setStrikeData((prevData) => ({ ...prevData, [strike]: response.data }));
-        setIsDataFetched(true);
       } catch (error) {
         console.error(`Error fetching data for ${strike}:`, error);
       }
+      setIsDataFetched(true);
     };
 
     const scheduleNextCall = () => {
@@ -85,6 +95,37 @@ const CoiLineChart = ({ mode, symbol, checkedStrikes }) => {
         }}
       >
         <Loader />
+      </div>
+    );
+  }
+
+  if (early) {
+    setEarly(false);
+    return (
+      <div style={{ height: "95%", marginTop: "5%" }}>
+        <div style={{ height: "80%" }}>
+          <img
+            src={require(`../images/early_${mode}.png`)}
+            alt=""
+            style={{
+              height: "100%",
+              width: "100%",
+              margin: "auto",
+              objectFit: "contain",
+              opacity: 0.7,
+            }}
+          />
+        </div>
+        <div
+          style={{
+            textAlign: "center",
+            fontFamily: "Comic Sans MS, 'Arial Rounded MT Bold', sans-serif",
+            color: "gray",
+          }}
+        >
+          Just hold on! Our OI buildup data starts pouring in just 5 minutes
+          after the opening bell rings.
+        </div>
       </div>
     );
   }
