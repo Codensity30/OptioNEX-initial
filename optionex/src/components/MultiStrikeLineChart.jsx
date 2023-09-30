@@ -50,7 +50,11 @@ const CoiLineChart = ({ mode, symbol, checkedStrikes }) => {
     const scheduleNextCall = () => {
       const now = DateTime.now().setZone("Asia/Kolkata");
       const minutes = now.minute;
-
+      // If trading is closed as of now
+      if (!isWithinTradingTime(now)) {
+        clearTimeout(intervalId);
+        return;
+      }
       // Calculate the delay until the next minute immediately following one divisible by 5
       const nextMinuteDivisibleBy5 = (Math.floor(minutes / 5) + 1) * 5;
       const delay = (nextMinuteDivisibleBy5 - minutes) * 60000;
@@ -73,6 +77,17 @@ const CoiLineChart = ({ mode, symbol, checkedStrikes }) => {
     return () => {
       clearTimeout(intervalId);
     };
+
+    // to check whether trading is open or not
+    function isWithinTradingTime(currentTime) {
+      return (
+        !(currentTime.weekday === 6 || currentTime.weekday === 7) &&
+        currentTime.hour >= 9 &&
+        currentTime.minute >= 15 &&
+        (currentTime.hour < 15 ||
+          (currentTime.hour === 15 && currentTime.minute <= 30))
+      );
+    }
   }, [symbol, checkedStrikes]);
 
   const fill = mode === "light" ? "#8c8c8c" : "#d9d9d9";
