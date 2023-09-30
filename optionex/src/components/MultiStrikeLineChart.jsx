@@ -21,11 +21,12 @@ const CoiLineChart = ({ mode, symbol, checkedStrikes }) => {
   const [isDataFetched, setIsDataFetched] = useState(false);
 
   useEffect(() => {
-    setIsDataFetched(true);
+    setIsDataFetched(false);
   }, [symbol]);
 
   useEffect(() => {
     let intervalId;
+    let fetchedStrikeCnt = 0;
     const fetchDataForStrike = async (strike) => {
       try {
         const response = await axios.get(
@@ -37,10 +38,13 @@ const CoiLineChart = ({ mode, symbol, checkedStrikes }) => {
           return;
         }
         setStrikeData((prevData) => ({ ...prevData, [strike]: response.data }));
+        fetchedStrikeCnt++;
+        if (fetchedStrikeCnt === checkedStrikes.length) {
+          setIsDataFetched(true);
+        }
       } catch (error) {
         console.error(`Error fetching data for ${strike}:`, error);
       }
-      setIsDataFetched(true);
     };
 
     const scheduleNextCall = () => {
