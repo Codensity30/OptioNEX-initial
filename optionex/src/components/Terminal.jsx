@@ -10,7 +10,12 @@ function Terminal() {
   const [symbol, setSymbol] = useState("NIFTY");
   const [expiryDate, setExpiry] = useState("current");
   const [currentExpiry, setCurrentExpiry] = useState("current");
-  const [mode, setMode] = useState("dark");
+  const [mode, setMode] = useState(getTheme);
+
+  function getTheme() {
+    let storedTheme = localStorage.getItem("theme"); // Attempt to get theme from local storage
+    return storedTheme ? storedTheme : "dark";
+  }
 
   function handleSymbolChange(e, newValue) {
     if (newValue != null) {
@@ -30,8 +35,13 @@ function Terminal() {
   }
 
   function handleModeChange() {
-    if (mode === "light") setMode("dark");
-    else setMode("light");
+    if (mode === "light") {
+      localStorage.setItem("theme", "dark");
+      setMode("dark");
+    } else {
+      localStorage.setItem("theme", "light");
+      setMode("light");
+    }
   }
 
   const theme = createTheme({

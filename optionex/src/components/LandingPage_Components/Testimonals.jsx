@@ -31,10 +31,23 @@ function Testimonals() {
                   <div className="relative p-6 space-y-6 leading-none rounded-lg bg-slate-800 ring-1 ring-gray-900/5">
                     <div className="flex items-center justify-between">
                       <div>
-                        <h3 className="text-lg font-semibold text-white">
-                          Tim Cook
-                        </h3>
-                        <p className="text-gray-500 text-md">CEO of Apple</p>
+                        <div className="flex gap-3 items-center">
+                          <h3 className="text-lg font-semibold text-white">
+                            Shushanth
+                          </h3>
+                          <a
+                            href="https://in.tradingview.com/u/shushanthk989/"
+                            rel="noreferrer"
+                            target="_blank"
+                            className="w-7 h-7"
+                          >
+                            <img
+                              src={require("../../images/tradingview.png")}
+                              alt="Trading View icon"
+                              className="object-contain rounded-full"
+                            />
+                          </a>
+                        </div>
                       </div>
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -46,9 +59,10 @@ function Testimonals() {
                       </svg>
                     </div>
                     <p className="leading-normal text-gray-300 text-md">
-                      Diam quis enim lobortis scelerisque fermentum dui faucibus
-                      in ornare. Donec pretium vulputate sapien nec sagittis
-                      aliquam malesuada bibendum.
+                      It's amazing how OptioNXT provides a perfect picture of
+                      OI, even for beginners. It's easy to use and great for
+                      analyzing OI data. I must say, this tool exceeded my
+                      expectations. Great job!
                     </p>
                   </div>
                 </div>
@@ -59,11 +73,22 @@ function Testimonals() {
 
                   <div className="relative p-6 space-y-6 leading-none rounded-lg bg-slate-800 ring-1 ring-gray-900/5">
                     <div className="flex items-center justify-between">
-                      <div>
+                      <div className="flex gap-3 items-center">
                         <h3 className="text-lg font-semibold text-white">
-                          Tim Cook
+                          Vinod
                         </h3>
-                        <p className="text-gray-500 text-md">CEO of Apple</p>
+                        <a
+                          href="https://in.tradingview.com/u/vinodtawar24/"
+                          rel="noreferrer"
+                          target="_blank"
+                          className="w-7 h-7"
+                        >
+                          <img
+                            src={require("../../images/tradingview.png")}
+                            alt="Trading View icon"
+                            className="object-contain rounded-full"
+                          />
+                        </a>
                       </div>
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -75,9 +100,10 @@ function Testimonals() {
                       </svg>
                     </div>
                     <p className="leading-normal text-gray-300 text-md">
-                      Diam quis enim lobortis scelerisque fermentum dui faucibus
-                      in ornare. Donec pretium vulputate sapien nec sagittis
-                      aliquam malesuada bibendum.
+                      OptioNXT is a game-changer for intraday traders! The open
+                      interest analysis and real-time sentiment tracking are
+                      invaluable. The multisrike COI feature is a bonus, making
+                      it easier to predict price movements.
                     </p>
                   </div>
                 </div>

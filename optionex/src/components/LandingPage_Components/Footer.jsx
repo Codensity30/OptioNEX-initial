@@ -36,6 +36,13 @@ function Footer() {
                     className="object-contain rounded-full"
                   />
                 </button>
+                <button className="bg-slate-100  shadow-lg font-normal h-10 w-10 p-2 items-center justify-center align-center rounded-full outline-none focus:outline-none mr-2">
+                  <img
+                    src={require("../../images/discord.png")}
+                    alt="Discord icon"
+                    className="object-contain rounded-full"
+                  />
+                </button>
               </div>
             </div>
             <div className="w-full lg:w-6/12 px-4">

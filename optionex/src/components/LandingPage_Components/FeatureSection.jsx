@@ -16,7 +16,7 @@ function FeatureSection() {
           </span>{" "}
           highlights
         </h2>
-        <div className="w-11/12 md:w-2/3 lg:w-1/2 pt-5 pb-11 font-Raleway text-slate-500 mx-auto">
+        <div className="w-11/12 md:w-2/3 lg:w-1/2 pt-5 pb-11 text-sm md:text-md font-Raleway text-slate-500 mx-auto">
           Embark on a modern trading odyssey with OptioNXT, your all-inclusive
           destination for navigating today's markets. behold the spotlight on
           three key features, merely a glimpse of the abundant treasures that
