@@ -36,7 +36,7 @@ export default function Example() {
             </div>
           </div>
           <div className="text-center">
-            <h1 className="text-4xl font-bold tracking-tight text-gray-900 font-Raleway">
+            <h1 className="text-4xl md:text-6xl font-bold tracking-tight text-gray-900 font-Raleway">
               Elevate your trading to a whole new{" "}
               <span className="bg-clip-text text-transparent bg-gradient-to-br from-sky-500 to-teal-500">
                 NXT
